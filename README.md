@@ -1,5 +1,8 @@
 micro.js
 ========
+
+Intorduction
+------------
 micro.js is a simple 
 [JavaScript](http://en.wikipedia.org/wiki/JavaScript) library for 
 creating small [HTML5](http://en.wikipedia.org/wiki/Html5) rich internet 
@@ -11,3 +14,31 @@ is very much inspired by the minimal programming environments of the
 [BASIC](http://en.wikipedia.org/wiki/Locomotive_BASIC) and 
 [LOGO](http://en.wikipedia.org/wiki/Logo_%28programming_language%29) 
 graphics APIs.
+
+
+Goals
+-----
+ *  A simple environment that allows beginner programmers to start 
+    writing visually intersting applications quickly.
+ 
+
+Guidelines
+----------
+ *  Only require the user to understand values (numbers, stings, 
+    arrays, objects and functions), variables, control stuctures, 
+    function calls and declarations.
+ *  Focus on a more functional programming style al-la LISPs and LOGOs.
+ *  This may be contiversial, but favor a flat global namespace for the
+    functions of the library.
+ *  It sould be possible to do something visual with only one line of 
+    code.
+ *  Use best practice when it dosn't get in the way of the previous 
+    guide lines.
+
+
+What micro.js provides
+----------------------
+
+
+Contributing
+------------

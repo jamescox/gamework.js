@@ -1,0 +1,2 @@
+backgroundcolor = 'white';
+bordercolor     = 'darkblue';

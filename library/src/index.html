@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>JavaScript disabled</title>
+    <script>
+      (function () {
+        document.title = 'Loading';
+        window.__titleAnimation__ = window.setInterval(function () {
+          if (document.title.length < 10) {
+            document.title += '.';
+          } else {
+            document.title = 'Loading';
+          }
+        }, 500);
+      }());
+    </script>
+    
+    <script src="js/micro.types.js"></script>
+    <script src="js/micro.collections.js"></script>
+    <script src="js/micro.math.js"></script>
+    <script src="js/micro.graphics.js"></script>
+    <script src="js/micro.app.js"></script>
+    
+    <script>
+      (function () {
+        window.onload = micro.app.__onloadhandler(true, 'main.js');
+      }());
+    </script>
+    
+    <link rel="stylesheet" href="css/micro.css">
+  </head>
+  <body>
+  </body>
+</html>

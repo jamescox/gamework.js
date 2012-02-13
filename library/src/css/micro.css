@@ -1,0 +1,50 @@
+html, body {
+  padding: 0;
+  margin:  0;
+  
+  width:  100%;
+  height: 100%;
+}
+
+
+.micro-screen-container {
+  position: relative;
+  
+  overflow: hidden;
+  
+  width:  100%;
+  height: 100%;
+}
+
+
+.micro-screen {
+  position: absolute;
+  
+  left: 50%;
+  top:  50%;
+  
+  overflow: hidden;
+}
+
+
+.micro-layer {
+  position: absolute;
+  
+  left:  0;
+  right: 0;
+  
+  top:    0;
+  bottom: 0;
+}
+
+.micro-sublayer {
+  display: block;
+  
+  padding: 0;
+  margin:  0;
+  
+  position: absolute;
+  
+  top:  0;
+  left: 0;
+}
