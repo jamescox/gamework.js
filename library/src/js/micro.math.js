@@ -49,6 +49,18 @@ var micro      = micro || {};
         }
       },
       
+      torad: {
+        value: function (a /* Angle in current angleunits.  */) {
+          return (a * angleScale); // Angle in radians.
+        }
+      },
+      
+      fromrad: {
+        value: function (a /* Angle in radians.  */) {
+          return (a / angleScale);  // Angle in current angleunits.
+        }
+      },
+      
       sin: {
         value: function (a) {
           return Math.sin(a * angleScale);

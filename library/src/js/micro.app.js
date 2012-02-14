@@ -11,12 +11,7 @@ var micro     = micro || {};
     micro.app = micro.app || {};
     
 (function (exports) {
-  var stateStack = [''], 
-      nextLoadJobId = 1, 
-      loadJobs = {}, 
-      fps = 60, 
-      updateInterval;
-  
+  var mainloop, loopCallbacks = [];
   
   function loadScript(src, callback) {
     var scriptEl = document.createElement('script');
@@ -28,46 +23,54 @@ var micro     = micro || {};
   }
   
   
-  function enter() {
-    var state     = stateStack[stateStack.length - 1],
-        enterName = 'enter';
-    
-    if (state) {
-      enterName += '_' + state;
-    }
-    
-    if (typeof(window[enterName]) === 'function') {
-      window[enterName]();
-    }
+  function StateManager() {
+    this.stateStack = [];
   }
   
   
-  function update() {
-    var state     = stateStack[stateStack.length - 1],
-        updateName = 'update';
-    
-    if (state) {
-      updateName += '_' + state;
-    }
-    
-    if (typeof(window[updateName]) === 'function') {
-      window[updateName]();
-    }
+  function IntervalMainLoop(loopCallback) {
+    this.running      = false;
+    this.fps          = 30;
+    this.interval     = null;
+    this.loopCallback = loopCallback;
   }
   
+  IntervalMainLoop.prototype.setFps = function (fps) {
+    if (this.fps !== fps) {
+      this.fps = fps;
+      
+      if (this.running) {
+        this.stop();
+        this.start();
+      }
+    }
+  };
   
-  function leave() {
-    var state     = stateStack[stateStack.length - 1],
-        leaveName = 'leave';
-    
-    if (state) {
-      leaveName += '_' + state;
+  IntervalMainLoop.prototype.getFps = function () {
+    return this.fps;
+  };
+  
+  IntervalMainLoop.prototype.start = function () {
+    if (!this.running) {
+      if (this.interval) {
+        window.clearInterval(this.interval);
+      }
+      
+      this.interval = window.setInterval(this.loopCallback, 1000 / this.fps);
+      this.running  = true;
     }
-    
-    if (typeof(window[leaveName]) === 'function') {
-      window[leaveName]();
+  };
+  
+  IntervalMainLoop.prototype.stop = function () {
+    if (this.running) {
+      if (this.interval) {
+        window.clearInterval(this.interval);
+        this.interval = null;
+      }
+      
+      this.running = false;
     }
-  }
+  };
   
   
   exports.install = function (ns) {
@@ -90,26 +93,14 @@ var micro     = micro || {};
     
     Object.defineProperties(ns, {
       startloadtask: {
-        value: function (description) {
-          var loadJobId = nextLoadJobId;
+        value: function () {
           
-          loadJobs[loadJobId] = description;
-          
-          nextLoadJobId += 1;
-          
-          // TODO:  Enter loading state.
-          
-          return loadJobId;
         }
       },
       
       completeloadtaks: {
-        value: function (id) {
-          delete loadJobs[id];
+        value: function () {
           
-          if (micro.collections.len(loadJobs) === 0) {
-            // TODO:  Leave loading state.
-          }
         }
       }
     });
@@ -130,6 +121,15 @@ var micro     = micro || {};
         loadScript(mainScript, function () {
           window.clearInterval(window.__titleAnimation__);
           document.title = 'Untitled Application';
+          
+          mainloop = new IntervalMainLoop(function () {
+            loopCallbacks = [micro.graphics.__loopcallback];
+            
+            micro.collections.foreach(function (item) {
+              item();
+            }, loopCallbacks);
+          });
+          mainloop.start();
         });
       };
     };

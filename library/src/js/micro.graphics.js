@@ -6,18 +6,154 @@ var micro          = micro || {};
       bordercolor     = '#707070',
       backgroundcolor = '#808080',
       imageCache      = {},
+      layers          = {},
       currentLayer;
+
+  var gfx = {
+    loadIdentity: function (g) {
+      // Load identity
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      
+      // [0, 0] is in the center of the screen
+      g.translate(Math.floor(micro.graphics.screenwidth  / 2),
+                  Math.floor(micro.graphics.screenheight / 2));
+                    
+      // Y-axis points up.
+      g.scale(1, -1);
+    },
+    
+    clear: function (g) {
+      g.save();
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.clearRect(0, 0, micro.graphics.screenwidth, micro.graphics.screenheight);
+      g.restore();
+    }
+  };
   
-  
-  function Sprite (name) {
-    this.name = 'default';
+  function Sprite(name, layer) {
+    this.layer       = layer;
+    this.name        = name;
+    this.pencolor    = 'black';
+    this.pensize     = 1;
+    this.pendown     = false;
+    this.fillcolor   = 'white';
+    this.visible     = true;
+    
+    this.x           = 0;
+    this.y           = 0;
+    this.a           = 0;
+    this.scale       = 1;
+    this.scalex      = 1;
+    this.scaley      = 1;
+    this.image       = null;
+    this.frameWidth  = 0;
+    this.frameHeight = 0;
   }
   
+  Sprite.prototype.moveTo = function (x, y) {
+    var g;
+    
+    x = +x;
+    y = +y;
+    
+    if (this.pendown) {
+      g = this.layer.dom.paperCtx;
       
+      g.strokeStyle = this.pencolor;
+      g.lineWidth   = this.pensize;
+      
+      g.beginPath();
+      g.moveTo(this.x, this.y);
+      g.lineTo(x, y);
+      g.stroke();
+    }
+    
+    this.x = x;
+    this.y = y;
+  };
+  
+  Sprite.prototype.moveBy = function (i, j) {
+    this.moveTo(this.x + i, this.y + j);
+  };
+  
+  Sprite.prototype.forward = function (m) {
+    var i, j;
+    
+    m = +m;
+    
+    i = -Math.cos(this.a + (Math.PI / 2)) * m;
+    j =  Math.sin(this.a + (Math.PI / 2)) * m;
+    
+    this.moveBy(i, j);
+  };
+  
+  Sprite.prototype.draw = function (g) {
+    if (!this.visible) {
+      return;
+    }
+    
+    g.save();
+    
+    g.translate(this.x, this.y);
+    g.scale(this.scalex, this.scaley);
+    g.rotate(-this.a);
+    
+    if (this.image) {
+    } else {
+      this.drawDefaultSprite(g);
+    }
+    
+    g.restore();
+  };
+  
+  Sprite.prototype.drawDefaultSprite = function (g) {
+    // Arrow outline.
+    g.strokeStyle = 'white';
+    g.lineWidth   = 5;
+    g.beginPath();
+    g.moveTo( 10.405, -5.978);
+    g.lineTo(  0.000, 12.000);
+    g.lineTo(-10.405, -5.978);
+    g.stroke();
+    
+    // Arrow fill.
+    g.strokeStyle = 'black';
+    g.lineWidth   = 3;
+    g.beginPath();
+    g.moveTo( 10.405, -5.978);
+    g.lineTo(  0.000, 12.000);
+    g.lineTo(-10.405, -5.978);
+    g.stroke();
+    
+    // Pen outline.
+    g.strokeStyle = 'white';
+    g.lineWidth   = 1;
+    g.beginPath();
+    g.arc(0, 0, 3.5, 0, Math.PI * 2);
+    g.stroke();
+    
+    if (this.pendown) {
+      g.fillStyle = this.pencolor;
+      g.beginPath();
+      g.arc(0, 0, 3, 0, Math.PI * 2);
+      g.fill();
+    } else {
+      g.strokeStyle = this.pencolor;
+      g.beginPath();
+      g.arc(0, 0, 2.5, 0, Math.PI * 2);
+      g.stroke();
+    }
+  };
+  
+  
   function Layer (name) {
     this.name = name;
     
     this.added = false;
+    this.sprites = {'default': new Sprite('default', this)};
+    this.currentSprite = this.sprites['default'];
+    this.currentSprite.pendown = true;
+    this.currentSprite.visible = false;
     
     this.dom = {
       container: document.createElement('div'),
@@ -31,12 +167,14 @@ var micro          = micro || {};
     
     this.dom.paper.setAttribute('class',     'micro-sublayer');
     this.dom.paper.setAttribute('className', 'micro-sublayer');
-
+    this.dom.paperCtx = this.dom.paper.getContext('2d');
+    
     this.dom.tiles.setAttribute('class',     'micro-sublayer');
     this.dom.tiles.setAttribute('className', 'micro-sublayer');
 
     this.dom.sprites.setAttribute('class',     'micro-sublayer');
     this.dom.sprites.setAttribute('className', 'micro-sublayer');
+    this.dom.spritesCtx = this.dom.sprites.getContext('2d');
     
     this.dom.container.appendChild(this.dom.paper);
     this.dom.container.appendChild(this.dom.tiles);
@@ -60,12 +198,23 @@ var micro          = micro || {};
   Layer.prototype.resize = function () {
     this.dom.paper.setAttribute('width',  micro.graphics.screenwidth);
     this.dom.paper.setAttribute('height', micro.graphics.screenheight);
+    gfx.loadIdentity(this.dom.paperCtx);
     
     this.dom.tiles.setAttribute('width',  micro.graphics.screenwidth);
     this.dom.tiles.setAttribute('height', micro.graphics.screenheight);
     
     this.dom.sprites.setAttribute('width',  micro.graphics.screenwidth);
     this.dom.sprites.setAttribute('height', micro.graphics.screenheight);
+    gfx.loadIdentity(this.dom.spritesCtx);
+  };
+  
+  Layer.prototype.draw = function () {
+    var layer = this;
+    
+    gfx.clear(layer.dom.spritesCtx);
+    micro.collections.foreach(function (sprite) {
+      sprite.draw(layer.dom.spritesCtx);
+    }, layer.sprites);
   };
   
   exports.install = function (ns) {
@@ -81,6 +230,16 @@ var micro          = micro || {};
           parent.appendChild(dom.container);
         }
       },
+      
+      
+      __loopcallback: {
+        value: function () {
+          micro.collections.foreach(function (layer) {
+            layer.draw();
+          }, layers);
+        }
+      },
+      
       
       resizescreen: {
         value: function (width, height) {
@@ -98,6 +257,10 @@ var micro          = micro || {};
           dom.screen.style.height = height + 'px';
           dom.screen.style.marginLeft = (-width / 2) + 'px';
           dom.screen.style.marginTop  = (-height / 2) + 'px';
+          
+          micro.collections.foreach(function (layer) {
+            layers.resize();
+          }, layers);
         }
       },
       
@@ -135,6 +298,78 @@ var micro          = micro || {};
         set: function (color) {
           dom.screen.style.backgroundColor = backgroundcolor = color;
         }
+      },
+      
+      home: {
+        value: function () {
+          var sprite = currentLayer.currentSprite;
+          
+          sprite.a = sprite.x = sprite.y = 0;
+        }
+      },
+      
+      clear: {
+        value: function () {
+          gfx.clear(currentLayer.dom.paperCtx);
+        }
+      },
+      
+      show: {
+        value: function () {
+          currentLayer.currentSprite.visible = true;
+        }
+      },
+      
+      hide: {
+        value: function () {
+          currentLayer.currentSprite.visible = false;
+        }
+      },
+      
+      moveto: {
+        value: function (x, y) {
+          currentLayer.currentSprite.moveTo(x, y);
+        }
+      },
+      
+      moveby: {
+        value: function (i, j) {
+          currentLayer.currentSprite.moveBy(i, j);
+        }
+      },
+      
+      penup: {
+        value: function () {
+          currentLayer.currentSprite.pendown = false;
+        }
+      },
+      
+      pendown: {
+        value: function () {
+          currentLayer.currentSprite.pendown = true;
+        }
+      },
+      
+      right: {
+        value: function (angle) {
+          angle = micro.math.torad(+angle);
+          
+          currentLayer.currentSprite.a += angle;
+        }
+      },
+      
+      left: {
+        value: function (angle) {
+          angle = micro.math.torad(+angle);
+          
+          currentLayer.currentSprite.a -= angle;
+        }
+      },
+      
+      forward: {
+        value: function (m) {
+          currentLayer.currentSprite.forward(m);
+        }
       }
     });
   };
@@ -159,6 +394,7 @@ var micro          = micro || {};
     dom.container.appendChild(dom.screen);
     
     currentLayer = new Layer('default');
+    layers.default = currentLayer;
     currentLayer.addToScreen();
   }
   
