@@ -7,28 +7,60 @@ var micro          = micro || {};
       backgroundcolor = '#808080',
       imageCache      = {},
       layers          = {},
-      currentLayer;
-
-  var gfx = {
-    loadIdentity: function (g) {
-      // Load identity
-      g.setTransform(1, 0, 0, 1, 0, 0);
-      
-      // [0, 0] is in the center of the screen
-      g.translate(Math.floor(micro.graphics.screenwidth  / 2),
-                  Math.floor(micro.graphics.screenheight / 2));
-                    
-      // Y-axis points up.
-      g.scale(1, -1);
-    },
+      currentLayer,
+      gfx = {
+        loadIdentity: function (g) {
+          // Load identity
+          g.setTransform(1, 0, 0, 1, 0, 0);
+          
+          // [0, 0] is in the center of the screen
+          g.translate(Math.floor(micro.graphics.screenwidth  / 2),
+                      Math.floor(micro.graphics.screenheight / 2));
+                        
+          // Y-axis points up.
+          g.scale(1, -1);
+        },
+        
+        clear: function (g) {
+          g.save();
+          g.setTransform(1, 0, 0, 1, 0, 0);
+          g.clearRect(0, 0, micro.graphics.screenwidth, micro.graphics.screenheight);
+          g.restore();
+        }
+      };
+  
+  
+  function getattr(object, key) {
+    var ikey;
     
-    clear: function (g) {
-      g.save();
-      g.setTransform(1, 0, 0, 1, 0, 0);
-      g.clearRect(0, 0, micro.graphics.screenwidth, micro.graphics.screenheight);
-      g.restore();
+    for (ikey in object) {
+      if (object.hasOwnProperty(ikey)) {
+        if (ikey.match(key)) {
+          return object[ikey];
+        }
+      }
     }
-  };
+  }
+  
+  
+  function vector() {
+    var arg0 = arguments[0], width, height;
+    
+    if (arguments.length === 0) {
+      return {x: 0, y: 0};
+    } else if (arguments.length === 1) {
+      if (arg0 instanceof Array) {
+        return {x: +arg0[0], y: +arg0[1]};
+      } else if (typeof(arg0) === 'object') {
+        width  = getattr(arg0, /^(r?x|r?i|(w(id)?(th)?))$/i);
+        height = getattr(arg0, /^(r?y|r?j|(h(eigh)?t?))$/i);
+        return {x: +width, y: +height};
+      }
+    } else {
+      return {x: +arguments[0], y: +arguments[1]};
+    }
+  }
+  
   
   function Sprite(name, layer) {
     this.layer       = layer;
@@ -49,6 +81,85 @@ var micro          = micro || {};
     this.frameWidth  = 0;
     this.frameHeight = 0;
   }
+  
+  Sprite.prototype.drawCircle = function () {
+    var pos, g = this.layer.dom.paperCtx, x = this.x, y = this.y, r;
+    
+    if (arguments.length === 1) {
+      r = +arguments[0];
+    } else if (arguments.length === 2) {
+      pos = vector(arguments[0]);
+      x = pos.x;
+      y = pos.y;
+      r = +arguments[1];
+    } else if (arguments.length === 3) {
+      x = +arguments[0];
+      y = +arguments[1];
+      r = +arguments[2];
+    } else {
+      return;
+    }
+    
+    g.strokeStyle = this.pencolor;
+    g.lineWidth   = this.pensize;
+    
+    g.save();
+    
+    g.translate(x, y);
+    g.rotate(this.a);
+    
+    g.beginPath();
+    
+    g.arc(0, 0, r, 0, Math.PI * 2);
+    
+    g.stroke();
+    g.restore();
+  };
+  
+  Sprite.prototype.drawElispe = function () {
+  };
+  
+  Sprite.prototype.drawSquare = function () {
+    var pos, g = this.layer.dom.paperCtx, x = this.x, y = this.y, r;
+    
+    if (arguments.length === 1) {
+      r = +arguments[0];
+    } else if (arguments.length === 2) {
+      pos = vector(arguments[0]);
+      x = pos.x;
+      y = pos.y;
+      r = +arguments[1];
+    } else if (arguments.length === 3) {
+      x = +arguments[0];
+      y = +arguments[1];
+      r = +arguments[2];
+    } else {
+      return;
+    }
+    
+    g.strokeStyle = this.pencolor;
+    g.lineWidth   = this.pensize;
+    
+    g.save();
+    
+    g.translate(x, y);
+    g.rotate(-this.a);
+    
+    g.beginPath();
+    
+    g.moveTo(-r / 2,  r / 2);
+    g.lineTo( r / 2,  r / 2);
+    g.lineTo( r / 2, -r / 2);
+    g.lineTo(-r / 2, -r / 2);
+    
+    g.closePath();
+    g.stroke();
+    g.restore();
+  };
+  
+  Sprite.prototype.drawRectangle = function () {
+  };
+  
   
   Sprite.prototype.moveTo = function (x, y) {
     var g;
@@ -219,51 +330,6 @@ var micro          = micro || {};
   
   exports.install = function (ns) {
     Object.defineProperties(ns, {
-      __reparent: {
-        value: function (parent) {
-          if (dom.parent) {
-            dom.parent.removeChild(dom.container);
-          }
-          
-          dom.parent = parent;
-          
-          parent.appendChild(dom.container);
-        }
-      },
-      
-      
-      __loopcallback: {
-        value: function () {
-          micro.collections.foreach(function (layer) {
-            layer.draw();
-          }, layers);
-        }
-      },
-      
-      
-      resizescreen: {
-        value: function (width, height) {
-          width  = +width;
-          height = +height;
-          
-          if (width < 1) {
-            width = micro.graphics.screenwidth;
-          }
-          if (height < 1) {
-            height = micro.graphics.screenheight;
-          }
-          
-          dom.screen.style.width  = width + 'px';
-          dom.screen.style.height = height + 'px';
-          dom.screen.style.marginLeft = (-width / 2) + 'px';
-          dom.screen.style.marginTop  = (-height / 2) + 'px';
-          
-          micro.collections.foreach(function (layer) {
-            layers.resize();
-          }, layers);
-        }
-      },
-      
       screenwidth: {
         get: function () {
           return +dom.screen.style.width.substring(0, dom.screen.style.width.length - 2);
@@ -282,6 +348,7 @@ var micro          = micro || {};
         }
       },
       
+      
       bordercolor: {
         get: function () {
           return bordercolor;
@@ -299,79 +366,134 @@ var micro          = micro || {};
           dom.screen.style.backgroundColor = backgroundcolor = color;
         }
       },
+    
       
-      home: {
-        value: function () {
-          var sprite = currentLayer.currentSprite;
-          
-          sprite.a = sprite.x = sprite.y = 0;
+      pencolor: {
+        get: function () {
+          return currentLayer.currentSprite.pencolor;
+        },
+        set: function (color) {
+          currentLayer.currentSprite.pencolor = '' + color;
         }
       },
       
-      clear: {
-        value: function () {
-          gfx.clear(currentLayer.dom.paperCtx);
-        }
-      },
-      
-      show: {
-        value: function () {
-          currentLayer.currentSprite.visible = true;
-        }
-      },
-      
-      hide: {
-        value: function () {
-          currentLayer.currentSprite.visible = false;
-        }
-      },
-      
-      moveto: {
-        value: function (x, y) {
-          currentLayer.currentSprite.moveTo(x, y);
-        }
-      },
-      
-      moveby: {
-        value: function (i, j) {
-          currentLayer.currentSprite.moveBy(i, j);
-        }
-      },
-      
-      penup: {
-        value: function () {
-          currentLayer.currentSprite.pendown = false;
-        }
-      },
-      
-      pendown: {
-        value: function () {
-          currentLayer.currentSprite.pendown = true;
-        }
-      },
-      
-      right: {
-        value: function (angle) {
-          angle = micro.math.torad(+angle);
-          
-          currentLayer.currentSprite.a += angle;
-        }
-      },
-      
-      left: {
-        value: function (angle) {
-          angle = micro.math.torad(+angle);
-          
-          currentLayer.currentSprite.a -= angle;
-        }
-      },
-      
-      forward: {
-        value: function (m) {
-          currentLayer.currentSprite.forward(m);
+      pensize: {
+        get: function () {
+          return currentLayer.currentSprite.pensize;
+        },
+        set: function (size) {
+          currentLayer.currentSprite.pensize = +size;
         }
       }
     });
+    
+    ns.drawcircle = function () {
+      var sprite = currentLayer.currentSprite;
+      
+      sprite.drawCircle.apply(sprite, arguments);
+    };
+    
+    ns.drawsquare = function () {
+      var sprite = currentLayer.currentSprite;
+      
+      sprite.drawSquare.apply(sprite, arguments);
+    };
+    
+    
+    ns.vector = vector;
+    
+    ns.__reparent = function (parent) {
+      if (dom.parent) {
+        dom.parent.removeChild(dom.container);
+      }
+      
+      dom.parent = parent;
+      
+      parent.appendChild(dom.container);
+    };
+    
+    
+    ns.__loopcallback = function () {
+      micro.collections.foreach(function (layer) {
+        layer.draw();
+      }, layers);
+    };
+    
+    ns.resizescreen = function (width, height) {
+      width  = +width;
+      height = +height;
+      
+      if (width < 1) {
+        width = micro.graphics.screenwidth;
+      }
+      if (height < 1) {
+        height = micro.graphics.screenheight;
+      }
+      
+      dom.screen.style.width  = width + 'px';
+      dom.screen.style.height = height + 'px';
+      dom.screen.style.marginLeft = (-width / 2) + 'px';
+      dom.screen.style.marginTop  = (-height / 2) + 'px';
+      
+      micro.collections.foreach(function (layer) {
+        layers.resize();
+      }, layers);
+    };
+    
+    
+    ns.home = function () {
+      var sprite = currentLayer.currentSprite;
+      
+      sprite.a = sprite.x = sprite.y = 0;
+    };
+    
+    ns.clear = function () {
+      gfx.clear(currentLayer.dom.paperCtx);
+    };
+    
+    ns.show = function () {
+      currentLayer.currentSprite.visible = true;
+    };
+    
+    ns.hide = function () {
+      currentLayer.currentSprite.visible = false;
+    };
+    
+    ns.moveto = function (x, y) {
+      currentLayer.currentSprite.moveTo(x, y);
+    };
+    
+    ns.moveby = function (i, j) {
+      currentLayer.currentSprite.moveBy(i, j);
+    };
+    
+    ns.penup = function () {
+      currentLayer.currentSprite.pendown = false;
+    };
+    
+    ns.pendown = function () {
+      currentLayer.currentSprite.pendown = true;
+    };
+    
+    ns.right = function (angle) {
+      angle = micro.math.torad(+angle);
+      
+      currentLayer.currentSprite.a += angle;
+    };
+    
+    ns.left = function (angle) {
+      angle = micro.math.torad(+angle);
+      
+      currentLayer.currentSprite.a -= angle;
+    };
+    
+    ns.forward = function (m) {
+      currentLayer.currentSprite.forward(m);
+    };
+      
+    ns.back = function (m) {
+      currentLayer.currentSprite.forward(-m);
+    };
   };
   
   

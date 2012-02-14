@@ -75,6 +75,17 @@ var micro     = micro || {};
   
   exports.install = function (ns) {
     Object.defineProperties(ns, {
+      title: {
+        get: function () {
+          return document.title;
+        },
+        set: function (title) {
+          document.title = title;
+        }
+      }
+    });
+    
+    Object.defineProperties(ns, {
       pushstate: {
         value: function (newstate) {
         }
@@ -120,7 +131,7 @@ var micro     = micro || {};
         
         loadScript(mainScript, function () {
           window.clearInterval(window.__titleAnimation__);
-          document.title = 'Untitled Application';
+          micro.app.title = 'Untitled Application';
           
           mainloop = new IntervalMainLoop(function () {
             loopCallbacks = [micro.graphics.__loopcallback];
