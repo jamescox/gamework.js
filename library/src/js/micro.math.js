@@ -11,7 +11,8 @@ var micro      = micro || {};
     micro.math = micro.math || {};
 
 (function (exports) {
-  var angleScale = Math.PI / 180;
+  var angleUnit  = 'deg',
+      angleScale = Math.PI / 180;
 
   exports.install = function (ns) {
     // Constants.
@@ -30,15 +31,20 @@ var micro      = micro || {};
     Object.defineProperties(ns, {
       angleunits: {
         get: function () {
-          return angleScale === 1.0 ? 'rad' : 'deg';
+          return angleUnit;
         },
         set: function (unit) {
           unit = unit.toLowerCase().substring(0, 3);
           
-          if (unit === 'rad') {
+          if (unit === 'rad') {        // Radians (native JavaScript units)
             angleScale = 1.0;
-          } else if (unit === 'deg') {
+            angleUnit  = unit;
+          } else if (unit === 'deg') { // Degrees
             angleScale = Math.PI / 180;
+            angleUnit  = unit;
+          } else if (unit === 'rev') { // Revolutions (turns)
+            angleScale = Math.PI * 2;
+            angleUnit  = unit;
           }
         }
       },
