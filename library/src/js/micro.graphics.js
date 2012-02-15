@@ -527,6 +527,10 @@ var micro          = micro || {};
     };
     
     
+    ns.stamp = function () {
+      currentLayer.currentSprite.draw(currentLayer.dom.paperCtx);
+    };
+    
     ns.home = function () {
       var sprite = currentLayer.currentSprite;
       
