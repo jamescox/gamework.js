@@ -1,0 +1,76 @@
+title:
+  Mathematical Utilities
+  
+sub-sections:
+  - title: Constants
+    
+    definitions: 
+      - name: pi
+        type: number
+        
+        summary: The mathematical constant π defined as 3.14159265.
+
+        
+      - name: tau
+        type: number
+        
+        summary: |
+                 The _new_ circle constant τ defined as 2π, see: 
+                 [tauday](http://tauday.com/)
+        
+        
+  - title: Units
+    
+    definitions:
+      - name: angleunits
+        type: string
+        
+        summary: The units that micro.js will use when expecting or 
+                 returning an angle.
+        
+        detail:  |
+                 This property expects the following values:
+                  *  `'deg'`, for Degrees (this is the default).
+                  *  `'rad'`, for Radians.
+                  *  `'rev'`, for Revolutions or turns.
+  
+
+  - title: Trigonometry
+  
+  
+  - title: Rounding
+  
+  
+  - title: Exponents, powers and roots
+  
+  
+  - title: Random numbers and selection
+    
+    definitions:
+      - name: random
+        type:
+          - '() -> number'
+          - '(upper : number) -> number'
+          - '(lower : number, upper : number) -> number'
+        
+        summary: Returns a random number.
+        
+        detail: The random number returned will lie between the `lower`
+                and `upper` parameters.
+        
+        parameters:
+          - name:   lower
+            detail: the lower limit of the number to generate (default is 0).
+          - name:   upper
+            detail: the upper limit of the number to generate (default is 1).
+            
+        returns: The randomly generated number.
+
+  
+  - title: Collections
+  
+  
+  - title: Miscellaneous
+  
+  
+  - title: Predicates
