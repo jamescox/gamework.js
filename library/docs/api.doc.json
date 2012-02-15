@@ -1,0 +1,99 @@
+{
+  "categories": [
+    {
+      "title": "Mathematics",
+      
+      "sub-categories": [
+        {
+          "title": "Random numbers and selection",
+          
+          "definitions": [
+            {
+              "name": 
+                "random",
+              
+              "summary":
+                "Generates a random number.",
+              
+              "call-signatures": [
+                "() \u2192 number",
+                "(upper : number) \u2192 number",
+                "(lower : number, upper : number) \u2192 number"
+              ],
+              
+              "arguments": [
+                { 
+                  "name": "lower",
+                  
+                  "description": "the lower limmit of the number to be generated.  Defaults to 0"
+                },
+                { 
+                  "name": "upper",
+                  
+                  "description": "the upper limmit of the number to be generated.  Defaults to 1"
+                }
+              ]
+            },
+            
+            {
+              "name": 
+                "randomint",
+              
+              "summary":
+                "Generates a random integer number.",
+                
+              "detail": 
+                "The chosen number will be from the inclusive range specified by the upper and lower limits.",
+              
+              "call-signatures": [
+                "() \u2192 number",
+                "(upper : number) \u2192 number",
+                "(lower : number, upper : number) \u2192 number"
+              ],
+              
+              "arguments": [
+                { 
+                  "name": "lower",
+                  
+                  "description": "the lower limmit of the number to be generated.  Defaults to 0"
+                },
+                { 
+                  "name": "upper",
+                  
+                  "description": "the upper limmit of the number to be generated.  Defaults to 1"
+                }
+              ]
+            },
+            
+            {
+              "name": 
+                "randompick",
+              
+              "summary":
+                "Selects a random item from a selection.",
+              
+              "call-signatures": [
+                "() \u2192 number",
+                "(upper : number) \u2192 number",
+                "(lower : number, upper : number) \u2192 number"
+              ],
+              
+              "arguments": [
+                { 
+                  "name": "lower",
+                  
+                  "description": "the lower limmit of the number to be generated.  Defaults to 0"
+                },
+                { 
+                  "name": "upper",
+                  
+                  "description": "the upper limmit of the number to be generated.  Defaults to 1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

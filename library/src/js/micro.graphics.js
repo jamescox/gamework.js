@@ -77,82 +77,73 @@ var micro          = micro || {};
     this.scale       = 1;
     this.scalex      = 1;
     this.scaley      = 1;
-    this.image       = null;
+    this.image       = 'arrow';
     this.frameWidth  = 0;
     this.frameHeight = 0;
   }
   
-  Sprite.prototype.drawCircle = function () {
-    var pos, g = this.layer.dom.paperCtx, x = this.x, y = this.y, r;
+  function parsePosSize(args) {
+    var pos, params = {x: this.x, y: this.y, size: 0};
     
-    if (arguments.length === 1) {
-      r = +arguments[0];
-    } else if (arguments.length === 2) {
-      pos = vector(arguments[0]);
-      x = pos.x;
-      y = pos.y;
-      r = +arguments[1];
-    } else if (arguments.length === 3) {
-      x = +arguments[0];
-      y = +arguments[1];
-      r = +arguments[2];
-    } else {
-      return;
+    if (args.length === 1) {
+      params.size = +args[0];
+    } else if (args.length === 2) {
+      pos = vector(args[0]);
+      params.x    = pos.x;
+      params.y    = pos.y;
+      params.size = +args[1];
+    } else if (args.length === 3) {
+      params.x    = +args[0];
+      params.y    = +args[1];
+      params.size = +args[2];
     }
+    
+    return params;
+  }
+  
+  
+  Sprite.prototype.transform = function (g, x, y) {
+    g.save();
+    
+    g.translate(x, y);
+    g.scale(this.scalex, this.scaley);
+    g.rotate(-this.a);
+  };
+  
+  
+  Sprite.prototype.drawCircle = function (params) {
+    var g = this.layer.dom.paperCtx;
+    
+    this.transform(g, params.x, params.y);
     
     g.strokeStyle = this.pencolor;
     g.lineWidth   = this.pensize;
     
-    g.save();
-    
-    g.translate(x, y);
-    g.rotate(this.a);
-    
     g.beginPath();
-    
-    g.arc(0, 0, r, 0, Math.PI * 2);
-    
+    g.arc(0, 0, params.size / 2, 0, Math.PI * 2);
     g.stroke();
+    
     g.restore();
   };
   
   Sprite.prototype.drawElispe = function () {
   };
   
-  Sprite.prototype.drawSquare = function () {
-    var pos, g = this.layer.dom.paperCtx, x = this.x, y = this.y, r;
+  Sprite.prototype.drawSquare = function (params) {
+    var g = this.layer.dom.paperCtx, w2 = params.size / 2;
     
-    if (arguments.length === 1) {
-      r = +arguments[0];
-    } else if (arguments.length === 2) {
-      pos = vector(arguments[0]);
-      x = pos.x;
-      y = pos.y;
-      r = +arguments[1];
-    } else if (arguments.length === 3) {
-      x = +arguments[0];
-      y = +arguments[1];
-      r = +arguments[2];
-    } else {
-      return;
-    }
+    this.transform(g, params.x, params.y);
     
     g.strokeStyle = this.pencolor;
     g.lineWidth   = this.pensize;
     
-    g.save();
-    
-    g.translate(x, y);
-    g.rotate(-this.a);
-    
     g.beginPath();
-    
-    g.moveTo(-r / 2,  r / 2);
-    g.lineTo( r / 2,  r / 2);
-    g.lineTo( r / 2, -r / 2);
-    g.lineTo(-r / 2, -r / 2);
-    
+    g.moveTo(-w2,  w2);
+    g.lineTo( w2,  w2);
+    g.lineTo( w2, -w2);
+    g.lineTo(-w2, -w2);
     g.closePath();
+    
     g.stroke();
     g.restore();
   };
@@ -203,21 +194,20 @@ var micro          = micro || {};
       return;
     }
     
-    g.save();
+    this.transform(g, this.x, this.y);
     
-    g.translate(this.x, this.y);
-    g.scale(this.scalex, this.scaley);
-    g.rotate(-this.a);
-    
-    if (this.image) {
-    } else {
-      this.drawDefaultSprite(g);
+    if (this.image === 'arrow') {
+      this.drawArrowSprite(g);
+    } else if (this.image === 'ghost') {
+      this.drawGhostSprite(g);
+    } else if (this.image === 'pacman') {
+      this.drawPacManSprite(g);
     }
     
     g.restore();
   };
   
-  Sprite.prototype.drawDefaultSprite = function (g) {
+  Sprite.prototype.drawArrowSprite = function (g) {
     // Arrow outline.
     g.strokeStyle = 'white';
     g.lineWidth   = 5;
@@ -254,6 +244,54 @@ var micro          = micro || {};
       g.arc(0, 0, 2.5, 0, Math.PI * 2);
       g.stroke();
     }
+  };
+  
+  
+  Sprite.prototype.drawGhostSprite = function (g) {
+    g.fillStyle = this.pencolor;
+    
+    g.beginPath();
+    
+    g.arc(0, 0, 18, 0, Math.PI);
+    
+    g.arc(-18, -15, 3, Math.PI * 1.5, Math.PI * 2);
+
+    g.arc(-12, -15, 3, Math.PI, Math.PI * 2, true);
+    g.arc( -6, -15, 3, Math.PI, Math.PI * 2);
+    
+    g.arc(  0, -15, 3, Math.PI, Math.PI * 2, true);
+    g.arc(  6, -15, 3, Math.PI, Math.PI * 2);
+    
+    g.arc( 12, -15, 3, Math.PI, Math.PI * 2, true);
+    g.arc( 18, -15, 3, Math.PI, Math.PI * 1.5);
+    
+    g.fill();
+
+    g.fillStyle = 'white';    
+    
+    g.beginPath();
+    g.arc(-6, 4, 4, 0, Math.PI * 2);
+    g.arc( 6, 4, 4, 0, Math.PI * 2);
+    g.fill();
+    
+    g.fillStyle = 'black';    
+    
+    g.beginPath();
+    g.arc(-6, 4, 2, 0, Math.PI * 2);
+    g.arc( 6, 4, 2, 0, Math.PI * 2);
+    g.fill();
+  };
+  
+  
+  Sprite.prototype.drawPacManSprite = function (g) {
+    var t = (1.0 + Math.sin((+(new Date()) / 250) * Math.PI)) * 0.125;
+    
+    g.fillStyle = this.pencolor;
+    
+    g.beginPath();
+    g.arc(0, 0, 18, Math.PI * 0.5 + (Math.PI * t), Math.PI * 0.5 - (Math.PI * t));
+    g.lineTo(0, 0);
+    g.fill();
   };
   
   
@@ -309,13 +347,14 @@ var micro          = micro || {};
   Layer.prototype.resize = function () {
     this.dom.paper.setAttribute('width',  micro.graphics.screenwidth);
     this.dom.paper.setAttribute('height', micro.graphics.screenheight);
-    gfx.loadIdentity(this.dom.paperCtx);
     
     this.dom.tiles.setAttribute('width',  micro.graphics.screenwidth);
     this.dom.tiles.setAttribute('height', micro.graphics.screenheight);
     
     this.dom.sprites.setAttribute('width',  micro.graphics.screenwidth);
     this.dom.sprites.setAttribute('height', micro.graphics.screenheight);
+    
+    gfx.loadIdentity(this.dom.paperCtx);
     gfx.loadIdentity(this.dom.spritesCtx);
   };
   
@@ -384,19 +423,50 @@ var micro          = micro || {};
         set: function (size) {
           currentLayer.currentSprite.pensize = +size;
         }
+      },
+      
+      layer: {
+        get: function () {
+          return currentLayer.name;
+        },
+        set: function (name) {
+        }
+      },
+      
+      sprite: {
+        get: function () {
+          return currentLayer.currentSprite.name;
+        },
+        set: function (name) {
+          name = ('' + name).toLowerCase();
+        
+          if (currentLayer.sprites.hasOwnProperty(name)) {
+            currentLayer.currentSprite = currentLayer.sprites[name];
+          }
+        }
+      },
+      
+      spriteskin: {
+        get: function () {
+          return currentLayer.currentSprite.image;
+        },
+        set: function (skin) {
+          currentLayer.currentSprite.image = '' + skin;
+        }
       }
     });
+    
     
     ns.drawcircle = function () {
       var sprite = currentLayer.currentSprite;
       
-      sprite.drawCircle.apply(sprite, arguments);
+      sprite.drawCircle(parsePosSize(arguments));
     };
     
     ns.drawsquare = function () {
       var sprite = currentLayer.currentSprite;
       
-      sprite.drawSquare.apply(sprite, arguments);
+      sprite.drawSquare(parsePosSize(arguments));
     };
     
     
@@ -436,8 +506,24 @@ var micro          = micro || {};
       dom.screen.style.marginTop  = (-height / 2) + 'px';
       
       micro.collections.foreach(function (layer) {
-        layers.resize();
+        layer.resize();
       }, layers);
+    };
+    
+    
+    ns.newsprite = function (name) {
+      name = ('' + name).toLowerCase();
+      
+      if (name.length !== 0) {    
+        if (currentLayer.sprites.hasOwnProperty(name)) {
+          return; // Can't create a sprite that already exists.
+        }
+        
+        currentLayer.sprites[name] = new Sprite(name, currentLayer);
+        currentLayer.currentSprite = currentLayer.sprites[name];
+        
+        return name;
+      }
     };
     
     

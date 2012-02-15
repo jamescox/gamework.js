@@ -11,7 +11,7 @@ var micro     = micro || {};
     micro.app = micro.app || {};
     
 (function (exports) {
-  var mainloop, loopCallbacks = [];
+  var state, mainloop, loopCallbacks = [];
   
   function loadScript(src, callback) {
     var scriptEl = document.createElement('script');
@@ -24,9 +24,48 @@ var micro     = micro || {};
   
   
   function StateManager() {
-    this.stateStack = [];
+    this.stack = [];
   }
   
+  StateManager.prototype.push = function (statename) {
+    this.stack.push('' + statename);
+  };
+  
+  StateManager.prototype.pop = function () {
+  };
+  
+  StateManager.prototype.set = function (statename) {
+  };
+  
+  StateManager.prototype.init = function () {
+    // When a new state is added to the stack.
+  };
+  
+  StateManager.prototype.enter = function () {
+    // When control retrurn to a state.
+  };
+  
+  StateManager.prototype.update = function () {
+    // Updates the top-most state.
+    var state      = this.stack[this.stack.length - 1],
+        updateName = 'update';
+    
+    if (state) {
+      updateName += '_' + state;
+    }
+    
+    if (typeof(window[updateName]) === 'function') {
+      window[updateName]();
+    }
+  };
+  
+  StateManager.prototype.leave = function () {
+    // When control leaves the a state.
+  };
+  
+  StateManager.prototype.term = function () {
+    // When a state is poped of the stack.
+  };
   
   function IntervalMainLoop(loopCallback) {
     this.running      = false;
@@ -36,7 +75,9 @@ var micro     = micro || {};
   }
   
   IntervalMainLoop.prototype.setFps = function (fps) {
-    if (this.fps !== fps) {
+    fps = +fps;
+    
+    if ((this.fps !== fps) && (fps > 0)) {
       this.fps = fps;
       
       if (this.running) {
@@ -81,6 +122,15 @@ var micro     = micro || {};
         },
         set: function (title) {
           document.title = title;
+        }
+      },
+      
+      fps: {
+        get: function () {
+          return mainloop.getFps();
+        },
+        set: function (fps) {
+          mainloop.setFps(fps);
         }
       }
     });
@@ -129,18 +179,22 @@ var micro     = micro || {};
           micro.app.install(window);
         }
         
+        state = new StateManager();
+        state.push(''); // The default state.
+        mainloop = new IntervalMainLoop(function () {
+          loopCallbacks = [
+            function () { state.update.call(state); }, 
+            micro.graphics.__loopcallback];
+          
+          micro.collections.foreach(function (item) {
+            item();
+          }, loopCallbacks);
+        });
+        mainloop.start();
+        
+        micro.app.title = 'Untitled Application';
         loadScript(mainScript, function () {
           window.clearInterval(window.__titleAnimation__);
-          micro.app.title = 'Untitled Application';
-          
-          mainloop = new IntervalMainLoop(function () {
-            loopCallbacks = [micro.graphics.__loopcallback];
-            
-            micro.collections.foreach(function (item) {
-              item();
-            }, loopCallbacks);
-          });
-          mainloop.start();
         });
       };
     };
