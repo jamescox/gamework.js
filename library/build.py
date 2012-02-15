@@ -20,6 +20,7 @@ class CompressParser(HTMLParser):
     self.micro_js   = json.dumps('<script>' + subprocess.check_output([
       'java', '-jar', 'tools/compiler.jar', '--js', 
       'src/js/micro/types.js',
+      'src/js/micro/string.js',
       'src/js/micro/collections.js',
       'src/js/micro/math.js',
       'src/js/micro/graphics.js',

@@ -173,6 +173,7 @@ var micro     = micro || {};
         
         if (flatten) {
           micro.types.install(window);
+          micro.string.install(window);
           micro.collections.install(window);
           micro.math.install(window);
           micro.graphics.install(window);
