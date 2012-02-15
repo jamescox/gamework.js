@@ -48,3 +48,15 @@ html, body {
   top:  0;
   left: 0;
 }
+
+
+noscript.micro {
+  padding: 0;
+  margin:  0;
+}
+
+.micro-error {
+  padding: 12px;
+  margin:  0;
+}
+

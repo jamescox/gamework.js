@@ -17,20 +17,79 @@
       }());
     </script>
     
-    <script src="js/micro.types.js"></script>
-    <script src="js/micro.collections.js"></script>
-    <script src="js/micro.math.js"></script>
-    <script src="js/micro.graphics.js"></script>
-    <script src="js/micro.app.js"></script>
-    
     <script>
+      // Script ~voodoo~
       (function () {
-        window.onload = micro.app.__onloadhandler(true, 'main.js');
+        var modern = (function () {
+          var canvas           = document.createElement('canvas'),
+              objectProperties = typeof(Object.defineProperties) === 'function',
+              canvasSupport    = typeof(canvas.getContext) === 'function',
+              contextSupport   = false;
+              
+          try {
+            canvas.getContext('2d');
+            contextSupport = true;
+          } catch (e) {}
+              
+          return objectProperties && canvasSupport && contextSupport;
+        }());
+        
+        if (modern) {
+          // begin includes
+          // this section will be replace in the final build.
+          document.write('<script src="js/micro/types.js"><\/script>');
+          document.write('<script src="js/micro/collections.js"><\/script>');
+          document.write('<script src="js/micro/math.js"><\/script>');
+          document.write('<script src="js/micro/graphics.js"><\/script>');
+          document.write('<script src="js/micro/app.js"><\/script>');
+          // end includes
+          document.write("<script>" + 
+            "(function () {" + 
+            "  window.onload = micro.app.__onloadhandler(true, 'main.js');" + 
+            "}());" + 
+            "<\/script>");
+        } else {
+          window.onload = function () {
+            window.clearInterval(window.__titleAnimation__);
+            
+            document.title = 'Browser insufficiently modern';
+            document.body.innerHTML = ('<div class="micro-error">' + 
+                '<h1>Browser insufficiently modern<\/h1>' + 
+                '<p>' + 
+                  'The browser you are using to run this application ' + 
+                  'does not support some of these required technologies:' +
+                  '<ul>' +
+                    '<li><p>ECMAScript 5' + 
+                      '<ul><li>Object.defineProperties<\/li><\/ul>' +
+                    '<\/p><\/li>' +
+                    '<li><p>HTML5' + 
+                      '<ul><li>canvas element and 2D drawing context<\/li><\/ul>' +
+                    '<\/p><\/li>' +
+                  '<\/ul>' +
+                '<\/p>' +
+                '<p>' +
+                  'To run this application please upgrade your ' + 
+                  'web browser.' + 
+                '<\/p>' +
+              '<\/div>');
+          };
+        }
       }());
     </script>
-    
+
     <link rel="stylesheet" href="css/micro.css">
   </head>
   <body>
+    <noscript class="micro">
+      <div class="micro-error">
+        <h1>JavaScript disabled</h1>
+        <p>
+          This application requires JavaScript to run.  Either your
+          browser dosn't support it, in which case you will need to 
+          upgrade to a more modern browser, or you have it disabled.
+          Please enable JavaScript to run this application, thank you.
+        </p>
+      </div>
+    </noscript>
   </body>
 </html>

@@ -1,65 +1,85 @@
-resizescreen(500, 500)
+// NOTE:  This is the 'test' main.js file the contents can be anything
+//        useful for testing.
 
-title = 'Colourfull Sprites';
-
-fps = 30;
+// Setup screen
+title           = 'Colourful Sprites';
+bordercolor     = '#222';
 backgroundcolor = '#ddd';
-bordercolor = 'black';
+fps             = 30;
+resizescreen(500, 500);
 
-show();
 
-newsprite('red');
-spriteskin = 'ghost';
-forward(100);
+// Setup sprites.
 right(90);
-pensize  = 3;
-pencolor = 'rgba(255, 0, 0, 0.333)';
-pendown();
-
-newsprite('blue');
-spriteskin = 'ghost';
-back(100);
-left(90);
-pensize  = 3;
-pencolor = 'rgba(0, 0, 255, 0.333)';
-pendown();
-
-newsprite('green');
-spriteskin = 'ghost';
-right(90);
-forward(100);
-right(90);
-pensize  = 3;
-pencolor = 'rgba(0, 128, 0, 0.333)';
-pendown();
-
-newsprite('yellow');
+pencolor   = 'yellow';
+pensize    = 5;
 spriteskin = 'pacman';
-left(90);
-forward(100);
-right(90);
-pensize  = 3;
-pencolor = 'yellow'; //'rgba(255, 255, 0, 0.333)';
+show()
+
+newsprite('shadow');
+moveto(0, 200);
+right(30);
+spriteskin = 'ghost';
+pencolor   = 'red';
+pensize    = 2;
+pendown();
+
+newsprite('speedy');
+moveto(0, 100);
+left(60);
+spriteskin = 'ghost';
+pencolor   = '#ffb8ff';
+pensize    = 2;
+pendown();
+
+newsprite('bashful');
+moveto(0, -100);
+right(30);
+spriteskin = 'ghost';
+pencolor   = '#0ff';
+pensize    = 2;
+pendown();
+
+newsprite('pokey');
+moveto(0, -200);
+left(60);
+spriteskin = 'ghost';
+pencolor   = '#ffb851';
+pensize    = 2;
 pendown();
 
 frames = 0;
 
-var update = function () {
-  var sprites = ['red', 'blue', 'green', 'yellow'];
+// Update function moves ghosts.
+update = function () {
+  var i, ghosts = ['shadow', 'speedy', 'bashful', 'pokey'];
   
   frames += 1;
   
-  foreach(function (name) {
-    sprite = name;
-    
-    forward(12);
-    right(10);
-    if (frames % 36 === 0) {
-      right(12);
+  for (i = 0; i < len(ghosts); i += 1) {
+    sprite = ghosts[i];
+    forward(10);
+    right(3);
+    if (frames % (360 / 3) === 0) {
+      left(6);
+      forward(10);
     }
-  }, sprites);
-
+    
+    if (spritey > 250) {
+      spritey = -250;
+    }
+    if (spritey < -250) {
+      spritey = 250;
+    }
+    
+    if (spritex > 250) {
+      spritex = -250;
+    }
+    if (spritex < -250) {
+      spritex = 250;
+    }
+  }
+  
+  // Leave default sprite active.
   sprite = 'default';
-  //right(1);
 };
-

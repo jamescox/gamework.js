@@ -1,114 +1,107 @@
-import codecs
+#!/usr/bin/python2
+
+import json
 import os
 import re
 import shutil
+import subprocess
+import sys
 
-import markdown
-
-
-build_dir    = ['build']
-doc_dir      = build_dir + ['doc']
-tmpl_dir     = build_dir + ['template']
-src_dir      = ['src']
-js_src_dir   = src_dir + ['js']
-html_src_dir = src_dir + ['html']
-css_src_dir  = src_dir + ['css']
+from HTMLParser import HTMLParser
 
 
-def pstr(path):
-    return os.path.join(*path)
+class CompressParser(HTMLParser):
+  output     = '<!DOCTYPE html>'
+  currenttag = ''
   
-
-def exists(path):
-    return os.path.exists(pstr(path))
-
-
-def mkdir(path):
-    for i in range(1, len(path) + 1):
-        parent = path[:i]
-        if not exists(parent):
-            os.mkdir(pstr(parent))
+  def __init__(self):
+    HTMLParser.__init__(self)
+    
+    self.micro_js   = json.dumps('<script>' + subprocess.check_output([
+      'java', '-jar', 'tools/compiler.jar', '--js', 
+      'src/js/micro/types.js',
+      'src/js/micro/collections.js',
+      'src/js/micro/math.js',
+      'src/js/micro/graphics.js',
+      'src/js/micro/app.js'
+    ]))[:-1] + '<\/script>"'
+    
   
-
-def listdir(path):
-    for subpath in os.listdir(pstr(path)):
-        yield path + [subpath]
+  def handle_starttag(self, tag, attrs):
+    self.currenttag = tag
+    
+    if tag != 'link':
+      if attrs:
+        self.output += '<%s %s>' % (tag, ' '.join('%s=%r' % attr for attr in attrs))
+      else:
+        self.output += '<%s>' % tag
+    else:
+      css = ' '.join(open('src/css/micro.css').read().split()).replace('; } ', '}').replace(', ', ',').replace(' { ', '{').replace(': ', ':').replace('; ', ';')
+      self.output += '<style>%s</style>' % css
+  
+  def handle_endtag(self, tag):
+    self.output += '</%s>' % tag
+    if tag == 'head':
+      self.output += '\n'
         
+  def handle_data(self, data):
+    if self.currenttag == 'script':
+      begin = data.find('// begin includes')
+      end   = data.find('// end includes')
 
-def section(md_source, level=3):
-    md_source = '\n%s\n' % md_source
-    output    = ''
-    
-    in_section = False
-    for frag in re.split(r'(\n\#{2,' + str(level) + r'}\s)', md_source, re.S | re.U | re.M):
-        hashes = frag.strip()
-        if (hashes == '#' * len(hashes)):
-           if in_section:
-               output += '\n\n<!-- end section -->\n\n'
-               in_section = False
-               
-           if len(hashes) == level:
-               frag = '\n\n<!-- begin section -->\n\n' + frag
-               in_section = True
-               
-        output += frag
-    
-    if in_section:
-        output += '<!-- end section -->\n\n'
-    
-    return output
-    
-    
-def extract_docs(source):
-    docs = ''
-    
-    for match in re.finditer(r'\/\*\*(.*?)\*\/', source, re.S | re.M | re.U):
-        docs += '\n'.join(line.strip()[3:] 
-                for line in match.group(1).strip().split('\n')) + '\n\n'
+      if (begin != -1) and (end != -1):
+        data = data[:begin] + ('document.write(%s);' % self.micro_js) + data[end:]
         
-    docs = '<!-- begin article -->\n\n' + section(section(docs, 4), 3) + '\n\n<!-- end article -->'
-    
-    return docs
+      open('.script-tmp.js', 'w').write(data)
+      data = subprocess.check_output(['java', '-jar', 'tools/compiler.jar', '--js', '.script-tmp.js'])
+      os.remove('.script-tmp.js')
+    else:
+      data = ' '.join(data.split())
+      
+    self.output += data
     
 
-def build_docs():
-    template_html = codecs.open(pstr(html_src_dir + ['doc.tmpl.html']), 'r', encoding='utf-8').read()
-    all_in_one = u''
-    shutil.copy(pstr(css_src_dir + ['doc.css']), pstr(doc_dir + ['css', 'default.css']))
-    
-    for js_souce_fn in listdir(js_src_dir):
-        if os.path.splitext(js_souce_fn[-1])[1] != '.js':
-            continue
-          
-        with codecs.open(pstr(js_souce_fn), 'r', encoding='utf-8') as fi:
-            js_source = fi.read()
-            md_source = extract_docs(js_source)
-            doc_html = (markdown.markdown(md_source, ['codehilite', 'headerid(forceid=False)'])
-                .replace('<!-- begin article -->', '<article>')
-                .replace('<!-- end article -->',   '</article>')
-                .replace('<!-- begin section -->', '<section>')
-                .replace('<!-- end section -->',   '</section>'))
-        
-        all_in_one += doc_html
-        
-        html_fn = pstr(doc_dir + [js_souce_fn[-1]])[:-3] + '.html'
-        with codecs.open(html_fn, 'w', encoding="utf-8") as fo:
-            doc_html = template_html.format(pre_title='', post_title='', body=doc_html)
-            fo.write(doc_html)
-            
-    with codecs.open(pstr(doc_dir + ['all.html']), 'w', encoding="utf-8") as fo:
-        doc_html = template_html.format(pre_title='', post_title='', body=all_in_one)
-        fo.write(doc_html)
+def build_micro_js():
+  parser = CompressParser()
+  parser.feed(open('src/index.html').read())
 
+  if not os.path.exists('build'):
+    os.mkdir('build')
+  
+  if not os.path.exists('build/template'):
+    os.mkdir('build/template')
+  
+  if not os.path.exists('build/examples'):
+    os.mkdir('build/examples')
+      
+  open('build/template/index.html', 'w').write(parser.output)
+  shutil.copy('src/main.default.js', 'build/template/main.js')
+  
+  for example in os.listdir('src/examples'):
+    example_src  = 'src/examples/' + example
+    example_dest = 'build/examples/' + example
     
+    if os.path.isdir(example_src):
+      shutil.copytree(example_src, example_dest)
+      open(example_dest + '/index.html', 'w').write(parser.output
+      )
+  
+  
+def clean():
+  try:
+    shutil.rmtree('build')
+  except OSError:
+    pass
+  
+  
 def main(args):
-    mkdir(doc_dir + ['css'])
-    mkdir(tmpl_dir)
-    
-    build_docs()
-
+  if len(args) == 0:
+    build_micro_js()
+  elif args[0] == 'clean':
+    clean()
+  
   
 if __name__ == '__main__':
-    import sys
-    
-    sys.exit(main(sys.argv[1:]))
+  main(sys.argv[1:])
+  
+  
