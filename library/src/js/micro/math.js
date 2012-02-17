@@ -1,3 +1,5 @@
+/*jslint browser: true, white: true, maxerr: 50, indent: 2 */
+
 /*  
     TODO:  
      *  Add maths predicates.
@@ -12,6 +14,8 @@ var micro      = micro || {};
     micro.math = micro.math || {};
 
 (function (exports) {
+  'use strict';
+  
   var SCALE_RAD  = 1.0,
       SCALE_DEG  = Math.PI / 180,
       SCALE_REV  = Math.PI * 2,
@@ -114,27 +118,31 @@ var micro      = micro || {};
       
     
     // Radom number generation.
-    ns.random = function (/* [upper=1 | lower=0, upper=1] */) {
+    ns.random = function (arg1, arg2 /* [upper=1 | lower=0, upper=1] */) {
       var lower = 0, upper = 1;
       
-      if (arguments.length === 1) {
-        upper = Math.floor(arguments[0]);
-      } else if (arguments.length > 1) {
-        lower = Math.floor(arguments[0]);
-        upper = Math.floor(arguments[1]);
+      if (typeof(arg1) !== 'undefined') {
+        if (typeof(arg2) !== 'undefined') {
+          upper = +arg1;
+        } else {
+          lower = +arg1;
+          upper = +arg2;
+        }
       }
-      
+
       return lower + Math.random() * (upper - lower);
     };
       
-    ns.randomint = function (/* [upper=1 | lower=0, upper=1] */) {
+    ns.randomint = function (arg1, arg2 /* [upper=1 | lower=0, upper=1] */) {
       var lower = 0, upper = 2;
       
-      if (arguments.length === 1) {
-        upper = Math.floor(arguments[0]) + 1;
-      } else if (arguments.length > 1) {
-        lower = Math.floor(arguments[0]);
-        upper = Math.floor(arguments[1]) + 1;
+      if (typeof(arg1) !== 'undefined') {
+        if (typeof(arg2) !== 'undefined') {
+          upper = Math.floor(arg1) + 1;
+        } else {
+          lower = Math.floor(arg1);
+          upper = Math.floor(arg2);
+        }
       }
       
       return lower + Math.floor(Math.random() * upper);

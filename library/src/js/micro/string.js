@@ -1,7 +1,11 @@
+/*jslint browser: true, sub: true, white: true, maxerr: 50, indent: 2 */
+
 var micro = micro || {};
     micro.string = micro.string || {};
     
 (function (exports) {
+  'use strict';
+  
   exports.install = function (ns) {
     ns.charcode = function (ch) {
       return ch.charCodeAt(0);

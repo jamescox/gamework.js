@@ -1,3 +1,5 @@
+/*jslint browser: true, white: true, nomen: true, maxerr: 50, indent: 2 */
+
 /*
     TODO:
      *  State stack.
@@ -11,6 +13,8 @@ var micro     = micro || {};
     micro.app = micro.app || {};
     
 (function (exports) {
+  'use strict';
+ 
   var state, mainloop, loopCallbacks = [];
   
   function loadScript(src, callback) {
@@ -28,13 +32,13 @@ var micro     = micro || {};
   }
   
   StateManager.prototype.push = function (statename) {
-    this.stack.push('' + statename);
+    this.stack.push(statename.toString());
   };
   
   StateManager.prototype.pop = function () {
   };
   
-  StateManager.prototype.set = function (statename) {
+  StateManager.prototype.set = function () {
   };
   
   StateManager.prototype.init = function () {
@@ -137,7 +141,7 @@ var micro     = micro || {};
     
     Object.defineProperties(ns, {
       pushstate: {
-        value: function (newstate) {
+        value: function () {
         }
       },
       
@@ -147,7 +151,7 @@ var micro     = micro || {};
       },
       
       changestate: {
-        value: function (newstate) {
+        value: function () {
         }
       }
     });

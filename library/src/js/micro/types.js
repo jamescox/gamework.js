@@ -1,8 +1,9 @@
-/*jslint browser: true, white: true, plusplus: true, maxerr: 50, indent: 2 */
+/*jslint browser: true, white: true, maxerr: 50, indent: 2 */
 
 /*
    TODO:
     *  Perhapse add 'regex' to the gettype return values.
+    *  Change definition in istall to attribute assignment.
  */
 
 var micro       = micro || {};

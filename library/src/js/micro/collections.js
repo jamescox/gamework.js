@@ -1,3 +1,5 @@
+/*jslint browser: true, white: true, maxerr: 50, indent: 2 */
+
 /*
     TODO:
      *  Add constructor functions for multi-dimentional arrays.
@@ -11,6 +13,8 @@ var micro             = micro || {};
     micro.collections = micro.collections || {};
 
 (function (exports) {
+  'use strict';
+
   exports.install = function (ns) {
     Object.defineProperties(ns, {
       foreach: { 
@@ -18,7 +22,7 @@ var micro             = micro || {};
           var key, i, coltype = micro.types.gettype(col);
           
           if ((coltype === 'string') || (coltype === 'array')) {
-            for (i = 0; i < col.length; ++i) {
+            for (i = 0; i < col.length; i += 1) {
               fn(col[i], i, col);
             }
           } else if (coltype === 'object') {
@@ -37,12 +41,12 @@ var micro             = micro || {};
           
           if (coltype === 'string') {
             ret = '';
-            for (i = 0; i < col.length; ++i) {
-              ret += '' + fn(col[i], i, col);
+            for (i = 0; i < col.length; i += 1) {
+              ret += fn(col[i], i, col).toString();
             }
           } else if (coltype === 'array') {
             ret = [];
-            for (i = 0; i < col.length; ++i) {
+            for (i = 0; i < col.length; i += 1) {
               ret.push(fn(col[i], i, col));
             }
           } else if (coltype === 'object') {
@@ -63,7 +67,7 @@ var micro             = micro || {};
           var key, i, coltype = micro.types.gettype(col);
           
           if ((coltype === 'string') || (coltype === 'array')) {
-            for (i = 0; i < col.length; ++i) {
+            for (i = 0; i < col.length; i += 1) {
               a = fn(a, col[i], i, col);
             }
           } else if (coltype === 'object') {
@@ -79,7 +83,7 @@ var micro             = micro || {};
       },
       
       filter: {
-        value: function (p, col) {
+        value: function (/*p, col*/) {
           // TODO
         }
       }

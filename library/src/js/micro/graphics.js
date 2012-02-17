@@ -1,11 +1,14 @@
+/*jslint browser: true, white: true, nomen: true, maxerr: 50, indent: 2 */
+
 var micro          = micro || {};
     micro.graphics = micro.graphics || {};
     
 (function (exports) {
+  'use strict';
+  
   var dom             = { parent: null },
       bordercolor     = '#707070',
       backgroundcolor = '#808080',
-      imageCache      = {},
       layers          = {},
       input           = { mouseX: 0, mouseY: 0, mouseButtons: {} },
       currentLayer,
@@ -43,22 +46,24 @@ var micro          = micro || {};
   }
   
   
-  function vector() {
-    var arg0 = arguments[0], width, height;
-    
-    if (arguments.length === 0) {
-      return {x: 0, y: 0};
-    } else if (arguments.length === 1) {
-      if (arg0 instanceof Array) {
-        return {x: +arg0[0], y: +arg0[1]};
-      } else if (typeof(arg0) === 'object') {
-        width  = getattr(arg0, /^(r?x|r?i|(w(id)?(th)?))$/i);
-        height = getattr(arg0, /^(r?y|r?j|(h(eigh)?t?))$/i);
-        return {x: +width, y: +height};
+  function vector(x, y) {
+    if ((typeof(x) === 'undefined') && (typeof(y) === 'undefined')) {
+      x = 0;
+      y = 0;
+    } else if (typeof(y) === 'undefined') {
+      if (x instanceof Array) {
+        y = +x[1];
+        x = +x[0];
+      } else if (typeof(x) === 'object') {
+        y = +getattr(x, /^(r?y|r?j|(h(eigh)?t?))$/i);
+        x = +getattr(x, /^(r?x|r?i|(w(id)?(th)?))$/i);
+      } else {
+        x = NaN;
+        y = NaN;
       }
-    } else {
-      return {x: +arguments[0], y: +arguments[1]};
     }
+    
+    return {x: x, y: y};
   }
   
   
@@ -332,16 +337,16 @@ var micro          = micro || {};
     this.dom.container.appendChild(this.dom.sprites);
     
     this.resize();
-  };
+  }
   
   Layer.prototype.addToScreen = function (after) {
     if (this.added) {
       dom.screen.removeChild(this.dom.container);
     }
     
-    if (after) {
+    if (after)/* {
       // TODO
-    } else {
+    } else */{
       dom.screen.appendChild(this.dom.container);
     }
   };
@@ -432,7 +437,7 @@ var micro          = micro || {};
           return currentLayer.currentSprite.pencolor;
         },
         set: function (color) {
-          currentLayer.currentSprite.pencolor = '' + color;
+          currentLayer.currentSprite.pencolor = color.toString();
         }
       },
       
@@ -449,7 +454,7 @@ var micro          = micro || {};
         get: function () {
           return currentLayer.name;
         },
-        set: function (name) {
+        set: function (/*name*/) {
         }
       },
       
@@ -458,7 +463,7 @@ var micro          = micro || {};
           return currentLayer.currentSprite.name;
         },
         set: function (name) {
-          name = ('' + name).toLowerCase();
+          name = name.toString().toLowerCase();
         
           if (currentLayer.sprites.hasOwnProperty(name)) {
             currentLayer.currentSprite = currentLayer.sprites[name];
@@ -471,7 +476,7 @@ var micro          = micro || {};
           return currentLayer.currentSprite.image;
         },
         set: function (skin) {
-          currentLayer.currentSprite.image = '' + skin;
+          currentLayer.currentSprite.image = skin.toString();
         }
       },
       
@@ -588,7 +593,7 @@ var micro          = micro || {};
     
     
     ns.newsprite = function (name) {
-      name = ('' + name).toLowerCase();
+      name = name.toString().toLowerCase();
       
       if (name.length !== 0) {    
         if (currentLayer.sprites.hasOwnProperty(name)) {
@@ -681,21 +686,27 @@ var micro          = micro || {};
     dom.container.appendChild(dom.screen);
     
     dom.container.onmousemove = function (e) {
-      if (!e) var e = window.event;
+      if (typeof(e) === 'undefined') {
+        e = window.event;
+      }
  
       input.mouseX = e.clientX - (dom.screen.offsetLeft + Math.floor(dom.screen.offsetWidth / 2));
       input.mouseY = -(e.clientY - (dom.screen.offsetTop + Math.floor(dom.screen.offsetHeight / 2)));
     };
     
     dom.container.onmousedown = function (e) {
-      if (!e) var e = window.event;
- 
+      if (typeof(e) === 'undefined') {
+        e = window.event;
+      }
+      
       input.mouseButtons[e.which] = true;
     };
     
     dom.container.onmouseup = function (e) {
-      if (!e) var e = window.event;
- 
+      if (typeof(e) === 'undefined') {
+        e = window.event;
+      }
+      
       input.mouseButtons[e.which] = false;
     };
     
