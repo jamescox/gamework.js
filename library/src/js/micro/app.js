@@ -167,6 +167,16 @@ var micro     = micro || {};
     });
     
     
+    ns.start = function () {
+      mainloop.start();
+    };
+    
+    
+    ns.stop = function () {
+      mainloop.stop();
+    };
+    
+    
     ns.__onloadhandler = function (flatten, mainScript) {
       return function () {
         micro.graphics.__reparent(document.body);

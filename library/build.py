@@ -83,10 +83,17 @@ def build_micro_js():
     example_dest = 'build/examples/' + example
     
     if os.path.isdir(example_src):
+      if os.path.exists(example_dest):
+        shutil.rmtree(example_dest)
+        
       shutil.copytree(example_src, example_dest)
       open(example_dest + '/index.html', 'w').write(parser.output
       )
   
+
+def build_docs():
+  pass
+
   
 def clean():
   try:
@@ -100,7 +107,9 @@ def main(args):
     build_micro_js()
   elif args[0] == 'clean':
     clean()
-  
+  elif args[0] == 'docs':
+    build_docs()
+    
   
 if __name__ == '__main__':
   main(sys.argv[1:])

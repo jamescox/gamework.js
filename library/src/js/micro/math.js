@@ -89,11 +89,13 @@ var micro      = micro || {};
     };
       
     ns.arctan = function (t) {
-      return Math.atan(t) * angleScale;
+      return Math.atan(t) / angleScale;
     };
       
     ns.arctan2 = function (x, y) {
-      return Math.atan2(y, x) * angleScale;
+      // The idea here is to have 0 face upwards just like the sprite 
+      // system works.
+      return Math.atan2(x, y) / angleScale;
     };
     
     

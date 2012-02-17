@@ -7,6 +7,7 @@ var micro          = micro || {};
       backgroundcolor = '#808080',
       imageCache      = {},
       layers          = {},
+      input           = { mouseX: 0, mouseY: 0, mouseButtons: {} },
       currentLayer,
       gfx = {
         loadIdentity: function (g) {
@@ -28,8 +29,7 @@ var micro          = micro || {};
           g.restore();
         }
       };
-  
-  
+      
   function getattr(object, key) {
     var ikey;
     
@@ -70,6 +70,8 @@ var micro          = micro || {};
     this.pendown     = false;
     this.fillcolor   = 'white';
     this.visible     = true;
+    this.update      = null;
+    this.data        = {};
     
     this.x           = 0;
     this.y           = 0;
@@ -82,8 +84,8 @@ var micro          = micro || {};
     this.frameHeight = 0;
   }
   
-  function parsePosSize(args) {
-    var pos, params = {x: this.x, y: this.y, size: 0};
+  function parsePosSize(sprite, args) {
+    var pos, params = {x: sprite.x, y: sprite.y, size: 0};
     
     if (args.length === 1) {
       params.size = +args[0];
@@ -359,7 +361,16 @@ var micro          = micro || {};
   };
   
   Layer.prototype.draw = function () {
-    var layer = this;
+    var layer = this, oldSpriteName = micro.graphics.sprite;
+      
+    micro.collections.foreach(function (sprite) {
+      if (sprite.update) {
+        micro.graphics.sprite = sprite.name;
+        sprite.update();
+      }
+    }, layer.sprites);
+    
+    micro.graphics.sprite = oldSpriteName;
     
     gfx.clear(layer.dom.spritesCtx);
     micro.collections.foreach(function (sprite) {
@@ -406,6 +417,15 @@ var micro          = micro || {};
         }
       },
     
+      
+      mousex: {
+        get: function () { return input.mouseX; }
+      },
+      
+      mousey: {
+        get: function () { return input.mouseY; }
+      },
+      
       
       pencolor: {
         get: function () {
@@ -471,20 +491,58 @@ var micro          = micro || {};
         set: function (y) {
           currentLayer.currentSprite.y = +y;
         }
+      },
+      
+      spriteangle: {
+        get: function () {
+          return micro.math.fromrad(currentLayer.currentSprite.a);
+        },
+        set: function (angle) {
+          angle = micro.math.torad(angle);
+          
+          currentLayer.currentSprite.a = angle;
+        }
+      },
+      
+      spritedata: {
+        get: function () {
+          return currentLayer.currentSprite.data;
+        },
+        set: function (data) {
+          currentLayer.currentSprite.data = data;
+        }
+      },
+      
+      spriteupdate: {
+        get: function () {
+          return currentLayer.currentSprite.update;
+        },
+        set: function (callback) {
+          if (typeof(callback) !== 'function') {
+            callback = null;
+          }
+          
+          currentLayer.currentSprite.update = callback;
+        }
       }
     });
+    
+    
+    ns.mousebutton = function (name) {
+      return input.mouseButtons[name];
+    };
     
     
     ns.drawcircle = function () {
       var sprite = currentLayer.currentSprite;
       
-      sprite.drawCircle(parsePosSize(arguments));
+      sprite.drawCircle(parsePosSize(sprite, arguments));
     };
     
     ns.drawsquare = function () {
       var sprite = currentLayer.currentSprite;
       
-      sprite.drawSquare(parsePosSize(arguments));
+      sprite.drawSquare(parsePosSize(sprite, arguments));
     };
     
     
@@ -543,7 +601,6 @@ var micro          = micro || {};
         return name;
       }
     };
-    
     
     ns.stamp = function () {
       currentLayer.currentSprite.draw(currentLayer.dom.paperCtx);
@@ -622,6 +679,25 @@ var micro          = micro || {};
     micro.graphics.resizescreen(400, 600);
     
     dom.container.appendChild(dom.screen);
+    
+    dom.container.onmousemove = function (e) {
+      if (!e) var e = window.event;
+ 
+      input.mouseX = e.clientX - (dom.screen.offsetLeft + Math.floor(dom.screen.offsetWidth / 2));
+      input.mouseY = -(e.clientY - (dom.screen.offsetTop + Math.floor(dom.screen.offsetHeight / 2)));
+    };
+    
+    dom.container.onmousedown = function (e) {
+      if (!e) var e = window.event;
+ 
+      input.mouseButtons[e.which] = true;
+    };
+    
+    dom.container.onmouseup = function (e) {
+      if (!e) var e = window.event;
+ 
+      input.mouseButtons[e.which] = false;
+    };
     
     currentLayer = new Layer('default');
     layers['default'] = currentLayer;
