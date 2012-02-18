@@ -15,7 +15,7 @@ var micro     = micro || {};
 (function (exports) {
   'use strict';
  
-  var state, mainloop, loopCallbacks = [];
+  var loadingOverlay, state, mainloop, loadingJobs = 0, loopCallbacks = [];
   
   function loadScript(src, callback) {
     var scriptEl = document.createElement('script');
@@ -71,11 +71,12 @@ var micro     = micro || {};
     // When a state is poped of the stack.
   };
   
-  function IntervalMainLoop(loopCallback) {
-    this.running      = false;
-    this.fps          = 30;
-    this.interval     = null;
-    this.loopCallback = loopCallback;
+  function IntervalMainLoop(loopCallbacks) {
+    this.running       = false;
+    this.fps           = 30;
+    this.interval      = null;
+    this.loopCallbacks = loopCallbacks;
+    this.loadtasks     = 0;
   }
   
   IntervalMainLoop.prototype.setFps = function (fps) {
@@ -91,17 +92,45 @@ var micro     = micro || {};
     }
   };
   
+  
+  IntervalMainLoop.prototype.startloadtask = function () {
+    if (this.loadtasks === 0) {
+      loadingOverlay.style.display = 'block';
+    }
+    
+    this.loadtasks += 1;
+  };
+  
+  
+  IntervalMainLoop.prototype.endloadtask = function () {
+    this.loadtasks = Math.max(0, this.loadtasks - 1);
+    
+    if (this.loadtasks === 0) {
+      loadingOverlay.style.display = 'none';
+    }
+  };
+  
+  
+  
   IntervalMainLoop.prototype.getFps = function () {
     return this.fps;
   };
   
   IntervalMainLoop.prototype.start = function () {
+    var self = this;
+    
     if (!this.running) {
       if (this.interval) {
         window.clearInterval(this.interval);
       }
       
-      this.interval = window.setInterval(this.loopCallback, 1000 / this.fps);
+      this.interval = window.setInterval(function () {
+        if (self.loadtasks === 0) {
+          foreach(function (callback) {
+            callback();
+          }, self.loopCallbacks);
+        }
+      }, 1000 / this.fps);
       this.running  = true;
     }
   };
@@ -159,13 +188,13 @@ var micro     = micro || {};
     Object.defineProperties(ns, {
       startloadtask: {
         value: function () {
-          
+          mainloop.startloadtask();
         }
       },
       
-      completeloadtaks: {
+      endloadtask: {
         value: function () {
-          
+          mainloop.endloadtask();
         }
       }
     });
@@ -194,22 +223,28 @@ var micro     = micro || {};
           micro.app.install(window);
         }
         
+        loadingOverlay = document.createElement('div');
+        loadingOverlay.innerHTML = 'Loading...';
+        loadingOverlay.style.display = '';
+        
+        loadingOverlay.setAttribute('class',     'micro-loading-overlay');
+        loadingOverlay.setAttribute('className', 'micro-loading-overlay');
+        
+        document.body.appendChild(loadingOverlay);
+        
         state = new StateManager();
         state.push(''); // The default state.
-        mainloop = new IntervalMainLoop(function () {
-          loopCallbacks = [
+        mainloop = new IntervalMainLoop([
             function () { state.update.call(state); }, 
-            micro.graphics.__loopcallback];
-          
-          micro.collections.foreach(function (item) {
-            item();
-          }, loopCallbacks);
-        });
+            micro.graphics.__loopcallback
+        ]);
+        mainloop.startloadtask();
         mainloop.start();
         
+        window.clearInterval(window.__titleAnimation__);
         micro.app.title = 'Untitled Application';
         loadScript(mainScript, function () {
-          window.clearInterval(window.__titleAnimation__);
+          mainloop.endloadtask();
         });
       };
     };

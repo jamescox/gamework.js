@@ -50,6 +50,17 @@ html, body {
 }
 
 
+.micro-loading-overlay {
+  position: absolute;
+  
+  left:  0;
+  right: 0;
+  
+  top:    0;
+  bottom: 0;
+};
+
+
 noscript.micro {
   padding: 0;
   margin:  0;

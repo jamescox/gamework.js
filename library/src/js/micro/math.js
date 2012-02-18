@@ -123,10 +123,10 @@ var micro      = micro || {};
       
       if (typeof(arg1) !== 'undefined') {
         if (typeof(arg2) !== 'undefined') {
-          upper = +arg1;
-        } else {
           lower = +arg1;
           upper = +arg2;
+        } else {
+          upper = +arg1;          
         }
       }
 
@@ -134,18 +134,20 @@ var micro      = micro || {};
     };
       
     ns.randomint = function (arg1, arg2 /* [upper=1 | lower=0, upper=1] */) {
-      var lower = 0, upper = 2;
+      var lower = 0, upper = 1;
       
       if (typeof(arg1) !== 'undefined') {
         if (typeof(arg2) !== 'undefined') {
-          upper = Math.floor(arg1) + 1;
-        } else {
           lower = Math.floor(arg1);
           upper = Math.floor(arg2);
+        } else {
+          upper = Math.floor(arg1);
         }
       }
       
-      return lower + Math.floor(Math.random() * upper);
+      upper += 1;
+      
+      return lower + Math.floor(Math.random() * (upper - lower));
     };
   
     ns.randompick = function (col) {

@@ -9,8 +9,10 @@ var micro          = micro || {};
   var dom             = { parent: null },
       bordercolor     = '#707070',
       backgroundcolor = '#808080',
+      frames          = 0,
       layers          = {},
       input           = { mouseX: 0, mouseY: 0, mouseButtons: {} },
+      images          = {},
       currentLayer,
       gfx = {
         loadIdentity: function (g) {
@@ -32,7 +34,29 @@ var micro          = micro || {};
           g.restore();
         }
       };
+  
+  
+  function getImage(name) {
+    name = name.toString();
+    
+    if (images.hasOwnProperty(name)) {
+      return images[name];
+    } else {
+      micro.app.startloadtask();
       
+      var img = new Image();
+      img.onload = function () {
+        micro.app.endloadtask();
+      }
+      img.src = 'app' + name;
+      
+      images[name] = img;
+      
+      return img;
+    }
+  }
+  
+    
   function getattr(object, key) {
     var ikey;
     
@@ -209,10 +233,18 @@ var micro          = micro || {};
       this.drawGhostSprite(g);
     } else if (this.image === 'pacman') {
       this.drawPacManSprite(g);
+    } else {
+      this.drawImageSprite(g);
     }
     
     g.restore();
   };
+  
+  
+  Sprite.prototype.drawImageSprite = function (g) {
+    g.drawImage(this.image, -this.image.width / 2, -this.image.height / 2);
+  };
+  
   
   Sprite.prototype.drawArrowSprite = function (g) {
     // Arrow outline.
@@ -344,9 +376,7 @@ var micro          = micro || {};
       dom.screen.removeChild(this.dom.container);
     }
     
-    if (after)/* {
-      // TODO
-    } else */{
+    if (!after) {
       dom.screen.appendChild(this.dom.container);
     }
   };
@@ -476,7 +506,13 @@ var micro          = micro || {};
           return currentLayer.currentSprite.image;
         },
         set: function (skin) {
-          currentLayer.currentSprite.image = skin.toString();
+          skin = skin.toString();
+          
+          if (skin[0] !== '/') {
+            currentLayer.currentSprite.image = skin;
+          } else {
+            currentLayer.currentSprite.image = getImage(skin);
+          }
         }
       },
       
@@ -529,6 +565,12 @@ var micro          = micro || {};
           
           currentLayer.currentSprite.update = callback;
         }
+      },
+      
+      frames: {
+        get: function () {
+          return frames;
+        }
       }
     });
     
@@ -568,6 +610,8 @@ var micro          = micro || {};
       micro.collections.foreach(function (layer) {
         layer.draw();
       }, layers);
+      
+      frames += 1;
     };
     
     ns.resizescreen = function (width, height) {
