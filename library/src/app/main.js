@@ -1,44 +1,80 @@
-// NOTE:  This is the 'test' main.js file the contents can be anything
-//        useful for testing.
+var ballx = 0,  bally = 0;
+var balli = 10, ballj = 10;
+var player1y = 0;
+var player2y = 0;
 
-resizescreen(800, 800);
 
-//fps = 4;
+function init() {
+  title = 'Pong';
+  backgroundcolor = 'black';
+  
+  resizescreen(600, 400);
+  
+  newsprite('ball');
+  spriteskin   = 'square';
+  spritedata   = {i: 10, j: 10};
+  spritewidth  = 20;
+  spriteheight = 20;
 
-colors = [
-  '  0,   0,   0',
-  '255,   0,   0',
-  '255, 255,   0',
-  '  0, 255,   0',
-  '  0, 255, 255',
-  '  0,   0, 255',
-  '255,   0, 255',
-  '255, 255, 255'
-];
 
-for (var i = 0; i < 100; i += 1) {
-  newsprite(i);
-  moveto(random(-400, 400), random(-400, 400));
-  pendown();
-  pencolor = 'rgba(' + randompick(colors) + ', ' + random(0.1, 0.5).toFixed(2) + ')';
-  pensize = random(1, 5);
+  newsprite('player1');
+  moveto(-270, 0);
+  spriteskin   = 'rectangle';
+  spritewidth  = 20;
+  spriteheight = 100;;
+  
+  
+  newsprite('player2');
+  moveto(270, 0);
+  spriteskin   = 'rectangle';
+  spritewidth  = 20;
+  spriteheight = 100;
+}
 
-  spriteupdate = function () {
-    var dx = mousex - spritex;
-    var dy = mousey - spritey;
-    
-    //console.log(mousex, mousey)
-    var targetangle = arctan2(dx, dy);
-    
-    if (targetangle > spriteangle) {
-      spriteangle += min(abs(spriteangle - targetangle), 8);
-    } else if (targetangle < spriteangle) {
-      spriteangle -= min(abs(spriteangle - targetangle), 8);
+
+function update() {
+  ballx += balli;
+  bally += ballj;
+
+  if (ballx > 290) {
+    ballx =  290;
+    balli = -balli;
+  } else if (ballx < -290) {
+    ballx = -290;
+    balli = -balli;
+  }
+  if (bally > 190) {
+    bally =  190;
+    ballj = -ballj;
+  } else if (bally < -190) {
+    bally = -190;
+    ballj = -ballj;
+  }
+  
+  if (ballx < 0) {
+    if (bally < player1y) {
+      player1y -= 5;
+    } else if (bally > player1y) {
+      player1y += 5;
     }
-    
-    if (mousebutton(1)) {
-      forward(10);
-      spriteskin = '/test-card.png';
-    }
-  };
+  }
+  
+  /*
+  if (key('up')) {
+    player2y += 5;
+  }
+  if (key('down'))  {
+    player2y -= 5;
+  }
+  */
+  player2y = mousey;
+  
+  sprite = 'ball';
+  moveto(ballx, bally);
+  
+  sprite  = 'player1';
+  spritey = player1y;
+  
+  sprite  = 'player2';
+  spritey = player2y;
 }

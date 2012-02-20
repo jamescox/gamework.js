@@ -33,6 +33,7 @@ var micro     = micro || {};
   
   StateManager.prototype.push = function (statename) {
     this.stack.push(statename.toString());
+    this.init();
   };
   
   StateManager.prototype.pop = function () {
@@ -42,11 +43,20 @@ var micro     = micro || {};
   };
   
   StateManager.prototype.init = function () {
-    // When a new state is added to the stack.
+    var state    = this.stack[this.stack.length - 1],
+        initName = 'init';
+    
+    if (state) {
+      initName += '_' + state;
+    }
+    
+    if (typeof(window[initName]) === 'function') {
+      window[initName]();
+    }
   };
   
   StateManager.prototype.enter = function () {
-    // When control retrurn to a state.
+    
   };
   
   StateManager.prototype.update = function () {
@@ -233,7 +243,6 @@ var micro     = micro || {};
         document.body.appendChild(loadingOverlay);
         
         state = new StateManager();
-        state.push(''); // The default state.
         mainloop = new IntervalMainLoop([
             function () { state.update.call(state); }, 
             micro.graphics.__loopcallback
@@ -244,6 +253,7 @@ var micro     = micro || {};
         window.clearInterval(window.__titleAnimation__);
         micro.app.title = 'Untitled Application';
         loadScript(mainScript, function () {
+          state.push(''); // The default state.
           mainloop.endloadtask();
         });
       };

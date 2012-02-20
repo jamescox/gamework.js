@@ -23,6 +23,7 @@ class CompressParser(HTMLParser):
       'src/js/micro/string.js',
       'src/js/micro/collections.js',
       'src/js/micro/math.js',
+      'src/js/micro/input.js',
       'src/js/micro/graphics.js',
       'src/js/micro/app.js'
     ]))[:-1] + '<\/script>"'
@@ -72,11 +73,14 @@ def build_micro_js():
   if not os.path.exists('build/template'):
     os.mkdir('build/template')
   
+  if not os.path.exists('build/template/app'):
+    os.mkdir('build/template/app')
+    
   if not os.path.exists('build/examples'):
     os.mkdir('build/examples')
       
   open('build/template/index.html', 'w').write(parser.output)
-  shutil.copy('src/main.default.js', 'build/template/main.js')
+  shutil.copy('src/app/main.default.js', 'build/template/app/main.js')
   
   for example in os.listdir('src/examples'):
     example_src  = 'src/examples/' + example

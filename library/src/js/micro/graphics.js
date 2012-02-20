@@ -7,7 +7,7 @@ var micro          = micro || {};
   'use strict';
   
   var dom             = { parent: null },
-      bordercolor     = '#707070',
+      bordercolor     = '#808080',
       backgroundcolor = '#808080',
       frames          = 0,
       layers          = {},
@@ -92,25 +92,25 @@ var micro          = micro || {};
   
   
   function Sprite(name, layer) {
-    this.layer       = layer;
-    this.name        = name;
-    this.pencolor    = 'black';
-    this.pensize     = 1;
-    this.pendown     = false;
-    this.fillcolor   = 'white';
-    this.visible     = true;
-    this.update      = null;
-    this.data        = {};
+    this.layer     = layer;
+    this.name      = name;
+    this.pencolor  = 'black';
+    this.pensize   = 1;
+    this.pendown   = false;
+    this.fillcolor = 'white';
+    this.visible   = true;
+    this.update    = null;
+    this.data      = {};
     
-    this.x           = 0;
-    this.y           = 0;
-    this.a           = 0;
-    this.scale       = 1;
-    this.scalex      = 1;
-    this.scaley      = 1;
-    this.image       = 'arrow';
-    this.frameWidth  = 0;
-    this.frameHeight = 0;
+    this.x         = 0;
+    this.y         = 0;
+    this.a         = 0;
+    this.scale     = 1;
+    this.scalex    = 1;
+    this.scaley    = 1;
+    this.image     = 'arrow';
+    this.width     = -1; // Default spite dimention
+    this.height    = -1;
   }
   
   function parsePosSize(sprite, args) {
@@ -233,6 +233,10 @@ var micro          = micro || {};
       this.drawGhostSprite(g);
     } else if (this.image === 'pacman') {
       this.drawPacManSprite(g);
+    } else if (this.image === 'square') {
+      this.drawSquareSprite(g);
+    } else if (this.image === 'rectangle') {
+      this.drawRectangleSprite(g);
     } else {
       this.drawImageSprite(g);
     }
@@ -241,8 +245,65 @@ var micro          = micro || {};
   };
   
   
+  Sprite.prototype.drawSquareSprite = function (g) {
+    var sz = Math.min(this.width, this.height) / 2;
+    
+    if (sz < 0) {
+      sz = 18;
+    }
+    
+    g.fillStyle = this.fillcolor;
+    g.beginPath();
+    g.moveTo(-sz,  sz);
+    g.lineTo( sz,  sz);
+    g.lineTo( sz, -sz);
+    g.lineTo(-sz, -sz);
+    g.fill();
+    
+    g.strokeStyle = this.pencolor;
+    g.lineWidth   = this.penszie;
+    g.beginPath();
+    g.moveTo(-sz,  sz);
+    g.lineTo( sz,  sz);
+    g.lineTo( sz, -sz);
+    g.lineTo(-sz, -sz);
+    g.stroke();
+  };
+  
+  
+  Sprite.prototype.drawRectangleSprite = function (g) {
+    var w = this.width / 2, h = this.height / 2;
+    
+    if (w < 0) {
+      w = 18;
+    }
+    if (h < 0) {
+      h = 18;
+    }
+    
+    g.fillStyle = this.fillcolor;
+    g.beginPath();
+    g.moveTo(-w,  h);
+    g.lineTo( w,  h);
+    g.lineTo( w, -h);
+    g.lineTo(-w, -h);
+    g.fill();
+    
+    g.strokeStyle = this.pencolor;
+    g.lineWidth   = this.penszie;
+    g.beginPath();
+    g.moveTo(-w,  h);
+    g.lineTo( w,  h);
+    g.lineTo( w, -h);
+    g.lineTo(-w, -h);
+    g.stroke();
+  };
+  
+  
   Sprite.prototype.drawImageSprite = function (g) {
-    g.drawImage(this.image, -this.image.width / 2, -this.image.height / 2);
+    if (this.image) {
+      g.drawImage(this.image, -this.image.width / 2, -this.image.height / 2);
+    }
   };
   
   
@@ -370,6 +431,23 @@ var micro          = micro || {};
     
     this.resize();
   }
+  
+  
+  Layer.prototype.unusedSpriteName = function () {
+    var name = '<';
+    
+    if (typeof(Layer.prototype.unusedSpriteName.next) === 'undefined') {
+      Layer.prototype.unusedSpriteName.next = 1;
+    }
+    
+    do {
+      name += Layer.prototype.unusedSpriteName.next + '-' + Math.floor(Math.random() * 10) + '>';
+    
+      Layer.prototype.unusedSpriteName.next += 1;
+    } while (this.sprites.hasOwnProperty(name));
+    
+    return name;
+  };
   
   Layer.prototype.addToScreen = function (after) {
     if (this.added) {
@@ -516,6 +594,24 @@ var micro          = micro || {};
         }
       },
       
+      spritewidth: {
+        get: function () {
+          return currentLayer.currentSprite.width;
+        },
+        set: function (width) {
+          currentLayer.currentSprite.width = +width;
+        }
+      },
+      
+      spriteheight: {
+        get: function () {
+          return currentLayer.currentSprite.height;
+        },
+        set: function (height) {
+          currentLayer.currentSprite.height = +height;
+        }
+      },
+      
       spritex: {
         get: function () {
           return currentLayer.currentSprite.x;
@@ -637,6 +733,10 @@ var micro          = micro || {};
     
     
     ns.newsprite = function (name) {
+      if (typeof(name) === 'undefined') {
+        name = currentLayer.unusedSpriteName();
+      }
+      
       name = name.toString().toLowerCase();
       
       if (name.length !== 0) {    
@@ -725,7 +825,7 @@ var micro          = micro || {};
     
     dom.screen.style.backgroundColor = backgroundcolor;
     
-    micro.graphics.resizescreen(400, 600);
+    micro.graphics.resizescreen(400, 400);
     
     dom.container.appendChild(dom.screen);
     
