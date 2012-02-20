@@ -21,12 +21,65 @@ var micro      = micro || {};
       SCALE_REV  = Math.PI * 2,
       angleUnit  = 'deg',
       angleScale = SCALE_DEG;
-      
+  
+  
+  function Vector(x, y) {
+    this.x = x;
+    this.y = y;
+    
+    Object.freeze(this);
+  }
+  
+  Vector.prototype.toString = function () {
+    return 'vector(' + this.x + ', ' + this.y + ')';
+  };
+  
 
   exports.install = function (ns) {
     // Constants.
     ns.pi = Math.PI;
     ns.tau = Math.PI * 2;
+    
+    
+    // Vector math.
+    // vector(x, y)
+    // vector(vector(...))
+    ns.vector = function (arg1, arg2) {
+      var v = null;
+      
+      if (typeof(arg1) !== 'undefined') {
+        if (typeof(arg2) !== 'undefined') {
+          // 2 arguments, should be two number like values.
+          arg1 = +arg1;
+          arg2 = +arg2;
+          
+          if (!(isNaN(arg1) || isNaN(arg2)) && isFinite(arg1) && isFinite(arg2)) {
+            // NOTE:  Finite restriction maybe too strict will look at this
+            //        later.
+            v = new Vector(arg1, arg2);
+          }
+        } else {
+          // 1 argument, should be a vector like object.
+          if ((micro.types.gettype(arg1) === 'array') && (arg1.length === 2)) {
+            // Two element array.
+            arg2 = arg1[1];
+            arg1 = arg1[0];
+            
+            v = vector(arg1, arg2);
+          } else if (micro.types.gettype(arg1) === 'object') {
+            // Vector like object.
+            arg2 = arg1.y;
+            arg1 = arg1.x;
+            
+            if ((typeof(arg1) !== 'undefined') && (typeof(arg2) !== 'undefined')) {
+              v = vector(arg1, arg2);
+            }
+          }
+        }
+      }
+      
+      return v;
+    };
     
     
     // Trigonometry.
