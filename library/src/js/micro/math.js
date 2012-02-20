@@ -74,7 +74,7 @@ var micro      = micro || {};
             arg1 = arg1.x;
             
             if ((typeof(arg1) !== 'undefined') && (typeof(arg2) !== 'undefined')) {
-              v = vector(arg1, arg2);
+              v = micro.math.vector(arg1, arg2);
             }
           }
         }

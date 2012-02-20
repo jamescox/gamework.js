@@ -12,13 +12,10 @@ var micro            = micro || {};
     // Positional properties.
     this.position = {x: 0, y: 0};
     this.angle = 0;
-    this.size = {
-      // Values less than zero mean use the default size for the 
-      // given sprite images, or arbitaraly 36px when no other sane
-      // default exists.
-      user:     {width: -1, height: -1}, // The value set by the user.  
-      internal: {x: 36,     y: 36}       // The actual value.
-    }; 
+    // Values less than zero mean use the default size for the 
+    // given sprite images, or arbitaraly 36px when no other sane
+    // default exists.
+    this.size = {x: -1, y: -1}; 
     
     // Drawing properties.
     this.pen = {

@@ -137,7 +137,7 @@ var micro     = micro || {};
       this.interval = window.setInterval(function () {
         if (self.loadtasks === 0) {
           foreach(function (callback) {
-            callback();
+            //callback();
           }, self.loopCallbacks);
         }
       }, 1000 / this.fps);

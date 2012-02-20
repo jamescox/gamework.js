@@ -6,6 +6,9 @@ var micro          = micro || {};
 (function (exports) {
   'use strict';
   
+  var screen = null;
+  
+  
   function Color(r, g, b, a) {
     this.r = r; this.g = g; this.b = b; this.a = a;
     Object.freeze(this);
@@ -32,8 +35,6 @@ var micro          = micro || {};
     var r, g, b, a, c = null;
     
     if (typeof(arg1) !== 'undefined') {
-      // 1 argument, should be a color like object or color name.
-      
       if ((typeof(arg2) !== 'undefined') && (typeof(arg3) !== 'undefined')) {
         // 3 arguments, should be three number like values:  r, g, b.
         r = +arg1;
@@ -46,6 +47,44 @@ var micro          = micro || {};
         } else {
           // Alpha default to 100%.
           a = 1;
+        }
+      } else {
+        // 1 argument, should be a color like object or color name.
+        switch (micro.types.gettype(arg1)) {
+        case 'string':
+          if (micro.__graphics.NAMED_COLORS.hasOwnProperty(arg1.toLowerCase())) {
+            r = micro.__graphics.NAMED_COLORS[arg1][0] / 255;
+            g = micro.__graphics.NAMED_COLORS[arg1][1] / 255;
+            b = micro.__graphics.NAMED_COLORS[arg1][2] / 255;
+            a = 1;
+          }
+          break;
+        
+        case 'array':
+          if (arg1.length === 3) {
+            r = +arg1[0];
+            g = +arg1[1];
+            b = +arg1[2];
+            a = 1;
+          } else if (arg1.length === 4) {
+            r = +arg1[0];
+            g = +arg1[1];
+            b = +arg1[2];
+            a = +arg1[3];
+          }
+          break;
+        
+        case 'object':
+          r = +arg1.r;
+          g = +arg1.g;
+          b = +arg1.b;
+          
+          if (typeof(arg1.a) !== 'undefined') {
+            a = +arg1.a;
+          } else {
+            a = 1;
+          }
+          break;
         }
       }
     }
@@ -64,6 +103,73 @@ var micro          = micro || {};
   
   
   exports.install = function (ns) {
+    Object.defineProperties(ns, {
+      bordercolor: {
+        get: function () {
+          return screen.getBorderColor();
+        },
+        set: function (color) {
+          screen.setBorderColor(color);
+        }
+      },
+      
+      pagecolor: {
+        get: function () {
+          return screen.getPageColor();
+        },
+        set: function (color) {
+          screen.setPageColor(color);
+        }
+      },
+      
+      resize: {
+        value: function (arg1, arg2) {
+          screen.setSize(arg1, arg2);
+        }
+      },
+      
+      pagesize: {
+        get: function () {
+          return screen.getSize();
+        },
+        set: function (size) {
+          screen.setSize(size);
+        }
+      },
+      
+      pagewidth: {
+        get: function () {
+          return screen.getSize().x;
+        },
+        set: function (width) {
+          var oldSize = screen.getSize(),
+              newSize = {x: width, y: oldSize.y};
+          
+          screen.setSize(newSize);
+        }
+      },
+      
+      pageheight: {
+        get: function () {
+          return screen.getSize().y;
+        },
+        set: function (height) {
+          var oldSize = screen.getSize(),
+              newSize = {x: oldSize.x, y: height};
+
+          screen.setSize(newSize);
+        }
+      }
+    });
+  
+    ns.__reparent = function (parent) {
+      if (screen === null) {
+        screen = new micro.__graphics.Screen();
+      }
+      
+      screen.setParent(parent);
+    };
+    
     ns.color = color;
   };
   

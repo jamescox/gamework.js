@@ -7,7 +7,7 @@ html, body {
 }
 
 
-.micro-screen-container {
+.micro-border {
   position: relative;
   
   overflow: hidden;
@@ -17,7 +17,7 @@ html, body {
 }
 
 
-.micro-screen {
+.micro-page {
   position: absolute;
   
   left: 50%;
