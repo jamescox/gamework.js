@@ -4,9 +4,12 @@ var micro            = micro || {};
 (function (exports) {
   'use strict';
   
+  function Layer(name, screen) {
+  };
+  
+  
   exports.install = function (ns) {
-    ns.Layer = function () {
-    };
+    ns.Layer = Layer;
   };
   
   exports.install(exports);

@@ -34,6 +34,8 @@ var micro      = micro || {};
     return 'vector(' + this.x + ', ' + this.y + ')';
   };
   
+  // TODO:  Add some vector math stuff here.
+  
 
   exports.install = function (ns) {
     // Constants.
