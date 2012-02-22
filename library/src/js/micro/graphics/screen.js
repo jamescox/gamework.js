@@ -37,7 +37,16 @@ var micro            = micro || {};
     if (parent) {
       this.setParent(parent);
     }
+    
+    this.newLayer('default');
   }
+  
+  Screen.prototype.update = function () {
+    var screen = this;
+    micro.collections.foreach(function (layer) {
+      layer.update();
+    }, screen.layers.order);
+  };
   
   // Config...
   Screen.prototype.getParent = function () {
@@ -107,6 +116,29 @@ var micro            = micro || {};
   };
   // ...Config
   
+  
+  // Layers...
+  Screen.prototype.newLayer = function (name) {
+    var layer;
+    
+    name = name.toLowerCase();
+    
+    if (!this.layers.lookup.hasOwnProperty(name)) {
+      layer = new micro.__graphics.Layer(name, this);
+      
+      this.layers.lookup[name] = layer;
+      this.layers.order.push(layer);
+      
+      this.els.page.appendChild(layer.els.container);
+      
+      if (this.layers.current === null) {
+        this.layers.current = layer;
+      }
+    }
+    
+    return layer.name;
+  };
+  // ...Layers
   
   exports.install = function (ns) {
     ns.Screen = Screen;

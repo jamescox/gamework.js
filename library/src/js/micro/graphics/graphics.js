@@ -159,15 +159,102 @@ var micro          = micro || {};
 
           screen.setSize(newSize);
         }
+      },
+      
+      skin: {
+        get: function () {
+          return screen.layers.current.currentSprite.getSkin();
+        },
+        set: function (skin) {
+          screen.layers.current.currentSprite.setSkin(skin);
+        }
+      },
+      
+      pencolor: {
+        get: function () {
+          return screen.layers.current.currentSprite.getPenColor();
+        },
+        set: function (color) {
+          screen.layers.current.currentSprite.setPenColor(color);
+        }
+      },
+      
+      pensize: {
+        get: function () {
+          return screen.layers.current.currentSprite.getPenSize();
+        },
+        set: function (size) {
+          screen.layers.current.currentSprite.setPenSize(size);
+        }
+      },
+      
+      spriteupdate: {
+        get: function () {
+          return screen.layers.current.currentSprite.getUserUpdateFunction();
+        },
+        set: function (fn) {
+          screen.layers.current.currentSprite.setUserUpdateFunction(fn);
+        }
+      },
+      
+      sprite: {
+        get: function () {
+          return screen.layers.current.getCurrentSpriteName();
+        },
+        set: function (name) {
+          screen.layers.current.setCurrentSpriteName(name);
+        }
       }
     });
   
-    ns.__reparent = function (parent) {
+    ns.newsprite = function (name) {
+      return screen.layers.current.newSprite(name);
+    };
+  
+    ns.show = function () {
+      screen.layers.current.currentSprite.show();
+    };
+  
+    ns.hide = function () {
+      screen.layers.current.currentSprite.hide();
+    };
+    
+    ns.pendown = function () {
+      screen.layers.current.currentSprite.penDown();
+    };
+  
+    ns.penup = function () {
+      screen.layers.current.currentSprite.penUp();
+    };
+    
+    ns.forward = function (m) {
+      screen.layers.current.currentSprite.forward(m);
+    };
+    
+    ns.back = function (m) {
+      screen.layers.current.currentSprite.back(m);
+    };
+    
+    ns.right = function (a) {
+      screen.layers.current.currentSprite.right(a);
+    };
+    
+    ns.left = function (a) {
+      screen.layers.current.currentSprite.left(a);
+    };
+    
+    ns.__onload = function (parent) {
       if (screen === null) {
         screen = new micro.__graphics.Screen();
       }
       
       screen.setParent(parent);
+    };
+    
+    ns.__update = function () {
+      if (screen) {
+        screen.update();
+      }
     };
     
     ns.color = color;

@@ -4,6 +4,23 @@ var micro            = micro || {};
 (function (exports) {
   'use strict';
   
+  // Taken from: http://webreflection.blogspot.com/2009/01/ellipse-and-circle-for-canvas-2d.html
+  function ellipse(g, x, y, width, height) {
+    var hB = (width / 2) * .5522848,
+        vB = (height / 2) * .5522848,
+        eX = x + width,
+        eY = y + height,
+        mX = x + width / 2,
+        mY = y + height / 2;
+        
+    g.moveTo(x, mY);
+    g.bezierCurveTo(x, mY - vB, mX - hB, y, mX, y);
+    g.bezierCurveTo(mX + hB, y, eX, mY - vB, eX, mY);
+    g.bezierCurveTo(eX, mY + vB, mX + hB, eY, mX, eY);
+    g.bezierCurveTo(mX - hB, eY, x, mY + vB, x, mY);
+    g.closePath();
+  }
+  
   function Sprite(name, layer) {
     // Ownership properties.
     this.name  = name;
@@ -12,10 +29,7 @@ var micro            = micro || {};
     // Positional properties.
     this.position = {x: 0, y: 0};
     this.angle = 0;
-    // Values less than zero mean use the default size for the 
-    // given sprite images, or arbitaraly 36px when no other sane
-    // default exists.
-    this.size = {x: -1, y: -1}; 
+    this.size = {x: 40, y: 40}; 
     
     // Drawing properties.
     this.pen = {
@@ -32,10 +46,12 @@ var micro            = micro || {};
     // Appearance properties.
     this.scale   = {x: 1, y: 1, both: 1};
     this.visible = true;
+    this.skin    = 'arrow';
     this.image   = 'arrow';
     
     // Behaviour / Animation.
-    this.update   = null;
+    this.userUpdateFunction = null;
+    
     this.tileinfo = {width: 0, height: 0};
     this.tile     = 0; // The default tile.
     
@@ -46,53 +62,170 @@ var micro            = micro || {};
   }
   
   // Sprite rendering...
-  Sprite.prototype.draw = function (g) {
+  Sprite.prototype.update = function (g) {
+    var previousCurrentSprite = this.layer.currentSprite;
+    
+    if (this.userUpdateFunction) {
+      this.layer.currentSprite = this;
+      this.userUpdateFunction();
+      this.layer.currentSprite = previousCurrentSprite;
+    }
+    
+    if (this.visible) {
+      g.save();
+      
+      g.translate(this.position.x, this.position.y);
+      g.scale(this.scale.x, this.scale.y);
+      g.rotate(-this.angle);
+      
+      switch (this.image) {
+      case 'arrow':
+        this.drawArrowSprite(g);
+        break;
+      
+      case 'rectangle':
+        this.drawRectangleSprite(g);
+        break;
+      
+      case 'square':
+        this.drawSquareSprite(g);
+        break;
+      
+      case 'ellipse':
+        this.drawEllipseSprite(g);
+        break;
+      
+      case 'circle':
+        this.drawCircleSprite(g);
+        break;
+      
+      case 'pacman':
+        this.drawPacManSprite(g);
+        break;
+        
+
+      case 'ghost':
+        this.drawGhostSprite(g);
+        break;
+        
+      default: // An image sprite.
+        this.drawImageSprite(g);
+        break;
+      }
+      
+      g.restore();
+    }
+    
+    this.drawDebugInfo(g);
+  };
+  
+  
+  Sprite.prototype.drawDebugInfo = function (g) {
+    var w = this.size.x * this.scale.x, 
+        h = this.size.y * this.scale.y,
+        a = this.visible ? 1 : 0.333,
+        f = micro.graphics.color(this.fill.color.r, this.fill.color.g, this.fill.color.b, this.fill.color.a * a),
+        s = micro.graphics.color(this.pen.color.r, this.pen.color.g, this.pen.color.b, this.pen.color.a * a),
+        r = this.pen.size * 2;
+    
+    if (this.layer.currentSprite === this) {
+      g.strokeStyle = 'rgba(255, 0, 0, ' + a + ')';
+    } else {
+      g.strokeStyle = 'rgba(0, 0, 255, ' + a + ')';
+    }
+    
     g.save();
     
     g.translate(this.position.x, this.position.y);
-    g.scale(this.scale.x, this.scale.y);
+    g.beginPath();
+    g.moveTo(-5,  0);
+    g.lineTo( 5,  0);
+    g.moveTo( 0, -5);
+    g.lineTo( 0,  5);
+    g.stroke();
+    
+    g.save();
     g.rotate(-this.angle);
     
-    switch (this.image) {
-    case 'arrow':
-      this.drawArrowSprite(g);
-      break;
+    g.lineWidth   = 1;
+    g.strokeRect(-w / 2, -h / 2, w, h);
+    g.restore();
     
-    case 'rectangle':
-      this.drawRectangleSprite(g);
-      break;
+    g.fillStyle = g.strokeStyle;
     
-    case 'square':
-      this.drawSquareSprite(g);
-      break;
+    g.scale(1, -1);
+    g.textBaseline = 'middle';
+    g.font = '12px sans-serif'
+    g.fillText(this.name, w / 2 + 3, 0);
     
-    case 'ellipse':
-      this.drawEllipseSprite(g);
-      break;
+    g.translate(-w / 2 - 3 - r * 1.5, 0);
+    g.fillStyle = f.toCss();
+    g.beginPath();
+    g.arc(0, 0, r, 0, Math.PI * 2);
+    g.fill();
     
-    case 'circle':
-      this.drawCircleSprite(g);
-      break;
+    g.strokeStyle = s.toCss();
+    g.lineWidth = this.pen.size;
+    g.beginPath();
+    g.arc(0, 0, r, 0, Math.PI * 2);
+    g.stroke();
     
-    case 'pacman':
-      this.drawPacManSprite(g);
-      break;
-      
-
-    case 'ghost':
-      this.drawGhostSprite(g);
-      break;
-      
-    default: // An image sprite.
-      this.drawImageSprite(g);
-      break;
+    if (this.pen.down) {
+      g.rotate(Math.PI);
     }
+    
+    g.fillStyle = 'black'; //'rgba(0, 0, 0, ' + a + ')';
+    g.beginPath();
+    g.moveTo( 0, -r * 1.5 - 8);
+    g.lineTo( 3, -r * 1.5 - 4);
+    g.lineTo(-3, -r * 1.5 - 4);
+    g.fill();
     
     g.restore();
   };
   
+  
   Sprite.prototype.drawArrowSprite = function (g) {
-    // TODO
+    var sz = Math.min(this.size.x, this.size.y);
+    
+    g.scale(sz / 36, sz / 36);
+    
+    // Arrow outline.
+    g.strokeStyle = 'white';
+    g.lineWidth   = 5;
+    g.beginPath();
+    g.moveTo( 10.405, -5.978);
+    g.lineTo(  0.000, 12.000);
+    g.lineTo(-10.405, -5.978);
+    g.stroke();
+    
+    // Arrow fill.
+    g.strokeStyle = 'black';
+    g.lineWidth   = 3;
+    g.beginPath();
+    g.moveTo( 10.405, -5.978);
+    g.lineTo(  0.000, 12.000);
+    g.lineTo(-10.405, -5.978);
+    g.stroke();
+    
+    // Pen outline.
+    g.strokeStyle = 'white';
+    g.lineWidth   = 1;
+    g.beginPath();
+    g.arc(0, 0, 3.5, 0, Math.PI * 2);
+    g.stroke();
+    
+    if (this.pen.down) {
+      g.fillStyle = this.pen.cssColor;
+      g.beginPath();
+      g.arc(0, 0, 3, 0, Math.PI * 2);
+      g.fill();
+    } else {
+      g.strokeStyle = this.pen.cssColor;
+      g.beginPath();
+      g.arc(0, 0, 2.5, 0, Math.PI * 2);
+      g.stroke();
+    }
   };
   
   Sprite.prototype.drawImageSprite = function (g) {
@@ -100,19 +233,54 @@ var micro            = micro || {};
   };
   
   Sprite.prototype.drawRectangleSprite = function (g) {
-    // TODO
+    var w = this.size.x, 
+        h = this.size.y;
+        
+    g.fillStyle = this.fill.cssColor;
+    g.fillRect(-w / 2, -h / 2, w, h);
+    
+    g.strokeStyle = this.pen.cssColor;
+    g.lineWidth   = this.pen.size;
+    g.strokeRect(-w / 2, -h / 2, w, h);
   };
   
   Sprite.prototype.drawSquareSprite = function (g) {
-    // TODO
+    var sz = Math.min(this.size.x, this.size.y);
+    
+    g.fillStyle = this.fill.cssColor;
+    g.fillRect(-sz / 2, -sz / 2, sz, sz);
+    
+    g.strokeStyle = this.pen.cssColor;
+    g.lineWidth   = this.pen.size;
+    g.strokeRect(-sz / 2, -sz / 2, sz, sz);
   };
   
   Sprite.prototype.drawEllipseSprite = function (g) {
-    // TODO
+    g.fillStyle = this.fill.cssColor;
+    g.beginPath();
+    ellipse(g, -this.size.x / 2, -this.size.y / 2, this.size.x, this.size.y);
+    g.fill();
+    
+    g.strokeStyle = this.pen.cssColor;
+    g.lineWidth   = this.pen.size;
+    g.beginPath();
+    ellipse(g, -this.size.x / 2, -this.size.y / 2, this.size.x, this.size.y);
+    g.stroke();
   };
   
   Sprite.prototype.drawCircleSprite = function (g) {
-    // TODO
+    var r = Math.min(this.size.x, this.size.y) / 2;
+    
+    g.fillStyle = this.fill.cssColor;
+    g.beginPath();
+    g.arc(0, 0, r, 0, Math.PI * 2);
+    g.fill();
+    
+    g.strokeStyle = this.pen.cssColor;
+    g.lineWidth   = this.pen.size;
+    g.beginPath();
+    g.arc(0, 0, r, 0, Math.PI * 2);
+    g.stroke();
   };
   
   Sprite.prototype.drawPacManSprite = function (g) {
@@ -165,16 +333,17 @@ var micro            = micro || {};
   // moveTo(x, y)
   // moveTo(vector(x, y))
   Sprite.prototype.moveTo = function (arg1, arg2) {
-    var pos = micro.math.vector(arg1, arg2), g = this.layer.paperCtx;
+    var pos = micro.math.vector(arg1, arg2), 
+        g   = this.layer.gfx.paper;
     
     if (pos !== null) {
       if (this.pen.down) {
-        g.strokeStyle = pen.cssColor;
-        g.lineWidth   = pen.size;
+        g.strokeStyle = this.pen.cssColor;
+        g.lineWidth   = this.pen.size;
       
         g.beginPath();
-          moveTo(this.position.x, this.position.y);
-          lineTo(          pos.x,           pos.y);   
+          g.moveTo(this.position.x, this.position.y);
+          g.lineTo(          pos.x,           pos.y);   
         g.stroke();
       }
       
@@ -196,7 +365,7 @@ var micro            = micro || {};
     m = +m;
     
     if (!isNaN(m) && isFinite(m)) {
-      this.moveBy(Math.cos(this.angle) * m, Math.sin(this.angle) * m);
+      this.moveBy(Math.sin(this.angle) * m, Math.cos(this.angle) * m);
     }
   };
   
@@ -267,14 +436,84 @@ var micro            = micro || {};
   Sprite.prototype.left  = Sprite.prototype.rotatecc;
   // ...Angle
   
+  // Skin...
+  Sprite.prototype.getSkin = function () {
+    return this.skin;
+  };
+  
+  Sprite.prototype.setSkin = function (skin) {
+    skin = skin.toString();
+    
+    if (skin) {
+      this.skin  = skin;
+      this.image = skin;
+    }
+  };
+  // ...Skin
+  
+  
+  // User Update Function...
+  Sprite.prototype.getUserUpdateFunction = function () {
+    return this.userUpdateFunction;
+  }
+  
+  Sprite.prototype.setUserUpdateFunction = function (fn) {
+    if (fn === null) {
+      this.userUpdateFunction = null;
+    } else if (typeof(fn) === 'function') {
+      this.userUpdateFunction = fn;
+    }
+  };
+  // ...User Update Function
+  
   
   // Color...
+  Sprite.prototype.getPenColor = function () {
+    return this.pen.color;
+  };
   // setPenColor(r, g, b, a)
   // setPenColor(color(...))
   Sprite.prototype.setPenColor = function (arg1, arg2, arg3, arg4) {
+    var c = micro.graphics.color(arg1, arg2, arg3, arg4);
+    
+    if (c !== null) {
+      this.pen.color    = c;
+      this.pen.cssColor = c.toCss();
+    }
   };
   // ...Color
   
+  // Pen Size...
+  Sprite.prototype.getPenSize = function () {
+    return this.pen.size;
+  };
+  
+  Sprite.prototype.setPenSize = function (size) {
+    size = +size;
+    
+    if (!isNaN(size) && isFinite(size)) {
+      this.pen.size = size;
+    }
+  };
+  // ...Pen Size
+  
+  // Pen up/down...
+  Sprite.prototype.isPenDown = function () {
+    return this.pen.down;
+  };
+  
+  Sprite.prototype.setPenDown = function (down) {
+    this.pen.down = !!down;
+  };
+  
+  Sprite.prototype.penDown = function () {
+    this.pen.down = true;
+  };
+  
+  Sprite.prototype.penUp = function () {
+    this.pen.down = false;
+  };
+  // ...Pen up/down  
   
   // Visibility...
   Sprite.prototype.isVisible = function () {

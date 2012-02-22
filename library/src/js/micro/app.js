@@ -137,7 +137,7 @@ var micro     = micro || {};
       this.interval = window.setInterval(function () {
         if (self.loadtasks === 0) {
           foreach(function (callback) {
-            //callback();
+            callback();
           }, self.loopCallbacks);
         }
       }, 1000 / this.fps);
@@ -222,7 +222,7 @@ var micro     = micro || {};
     
     ns.__onloadhandler = function (flatten, mainScript) {
       return function () {
-        micro.graphics.__reparent(document.body);
+        micro.graphics.__onload(document.body);
         
         if (flatten) {
           micro.types.install(window);
@@ -245,7 +245,7 @@ var micro     = micro || {};
         state = new StateManager();
         mainloop = new IntervalMainLoop([
             function () { state.update.call(state); }, 
-            micro.graphics.__loopcallback
+            micro.graphics.__update
         ]);
         mainloop.startloadtask();
         mainloop.start();
