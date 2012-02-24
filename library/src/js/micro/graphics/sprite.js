@@ -1,6 +1,3 @@
-var micro            = micro || {};
-    micro.__graphics = micro.__graphics || {};
-
 (function (exports) {
   'use strict';
   
@@ -116,7 +113,7 @@ var micro            = micro || {};
       g.restore();
     }
     
-    this.drawDebugInfo(g);
+    // this.drawDebugInfo(g);
   };
   
   
@@ -539,4 +536,4 @@ var micro            = micro || {};
   };
   
   exports.install(exports);
-}(micro.__graphics));
+}(micro._));

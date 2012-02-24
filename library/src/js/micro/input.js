@@ -1,32 +1,20 @@
-var micro       = micro || {};
-    micro.input = micro.input || {};
-
-(function (exports) {
+(function (exports, _) {
   'use strict';
   
   var keyEl = null, mouseEl = null;
   
   
   exports.install = function (ns) {
-    ns.__hook = function (keyel, mouseel) {
-      // Unhook previously hooked elements.
-      /*
-      if (keyEl) {
-        //
-      }
-      if (mouseEl) {
-      }*/
-    };
-    
-    
     Object.defineProperties(ns, {
       mousex: {
         get: function () {
-        }
+        },
+        enumerable: true
       },
       mousey: {
         get: function () {
-        }
+        },
+        enumerable: true
       }
     });
     
@@ -37,5 +25,15 @@ var micro       = micro || {};
     };
   };
   
+  _.inputHook = function (keyel, mouseel) {
+    // Unhook previously hooked elements.
+    /*
+    if (keyEl) {
+      //
+    }
+    if (mouseEl) {
+    }*/
+  };
+  
   exports.install(exports);
-}(micro.input));
+}(micro.input, micro._));

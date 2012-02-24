@@ -9,8 +9,6 @@
      *  Add predicates: isempty, haskey, etc.
  */
 
-var micro             = micro || {};
-    micro.collections = micro.collections || {};
 
 (function (exports) {
   'use strict';

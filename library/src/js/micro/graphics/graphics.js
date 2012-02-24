@@ -1,12 +1,10 @@
 /*jslint browser: true, white: true, nomen: true, maxerr: 50, indent: 2 */
 
-var micro          = micro || {};
-    micro.graphics = micro.graphics || {};
-    
-(function (exports) {
+
+(function (exports, Screen, NAMED_COLORS, _) {
   'use strict';
   
-  var screen = null;
+  var frames = 0, screen = null;
   
   
   function Color(r, g, b, a) {
@@ -52,10 +50,10 @@ var micro          = micro || {};
         // 1 argument, should be a color like object or color name.
         switch (micro.types.gettype(arg1)) {
         case 'string':
-          if (micro.__graphics.NAMED_COLORS.hasOwnProperty(arg1.toLowerCase())) {
-            r = micro.__graphics.NAMED_COLORS[arg1][0] / 255;
-            g = micro.__graphics.NAMED_COLORS[arg1][1] / 255;
-            b = micro.__graphics.NAMED_COLORS[arg1][2] / 255;
+          if (NAMED_COLORS.hasOwnProperty(arg1.toLowerCase())) {
+            r = NAMED_COLORS[arg1][0] / 255;
+            g = NAMED_COLORS[arg1][1] / 255;
+            b = NAMED_COLORS[arg1][2] / 255;
             a = 1;
           }
           break;
@@ -104,13 +102,21 @@ var micro          = micro || {};
   
   exports.install = function (ns) {
     Object.defineProperties(ns, {
+      frames: {
+        get: function () {
+          return frames;
+        },
+        enumerable: true
+      },
+      
       bordercolor: {
         get: function () {
           return screen.getBorderColor();
         },
         set: function (color) {
           screen.setBorderColor(color);
-        }
+        },
+        enumerable: true
       },
       
       pagecolor: {
@@ -119,13 +125,8 @@ var micro          = micro || {};
         },
         set: function (color) {
           screen.setPageColor(color);
-        }
-      },
-      
-      resize: {
-        value: function (arg1, arg2) {
-          screen.setSize(arg1, arg2);
-        }
+        },
+        enumerable: true
       },
       
       pagesize: {
@@ -134,7 +135,8 @@ var micro          = micro || {};
         },
         set: function (size) {
           screen.setSize(size);
-        }
+        },
+        enumerable: true
       },
       
       pagewidth: {
@@ -146,7 +148,8 @@ var micro          = micro || {};
               newSize = {x: width, y: oldSize.y};
           
           screen.setSize(newSize);
-        }
+        },
+        enumerable: true
       },
       
       pageheight: {
@@ -158,7 +161,8 @@ var micro          = micro || {};
               newSize = {x: oldSize.x, y: height};
 
           screen.setSize(newSize);
-        }
+        },
+        enumerable: true
       },
       
       skin: {
@@ -167,7 +171,8 @@ var micro          = micro || {};
         },
         set: function (skin) {
           screen.layers.current.currentSprite.setSkin(skin);
-        }
+        },
+        enumerable: true
       },
       
       pencolor: {
@@ -176,7 +181,8 @@ var micro          = micro || {};
         },
         set: function (color) {
           screen.layers.current.currentSprite.setPenColor(color);
-        }
+        },
+        enumerable: true
       },
       
       pensize: {
@@ -185,7 +191,8 @@ var micro          = micro || {};
         },
         set: function (size) {
           screen.layers.current.currentSprite.setPenSize(size);
-        }
+        },
+        enumerable: true
       },
       
       spriteupdate: {
@@ -194,7 +201,8 @@ var micro          = micro || {};
         },
         set: function (fn) {
           screen.layers.current.currentSprite.setUserUpdateFunction(fn);
-        }
+        },
+        enumerable: true
       },
       
       sprite: {
@@ -203,9 +211,14 @@ var micro          = micro || {};
         },
         set: function (name) {
           screen.layers.current.setCurrentSpriteName(name);
-        }
+        },
+        enumerable: true
       }
     });
+  
+    ns.resize = function (arg1, arg2) {
+      screen.setSize(arg1, arg2);
+    };
   
     ns.newsprite = function (name) {
       return screen.layers.current.newSprite(name);
@@ -243,22 +256,26 @@ var micro          = micro || {};
       screen.layers.current.currentSprite.left(a);
     };
     
-    ns.__onload = function (parent) {
-      if (screen === null) {
-        screen = new micro.__graphics.Screen();
-      }
-      
-      screen.setParent(parent);
-    };
     
-    ns.__update = function () {
-      if (screen) {
-        screen.update();
-      }
-    };
     
     ns.color = color;
   };
   
+  _.graphicsOnLoad = function (parent) {
+    if (screen === null) {
+      screen = new Screen();
+    }
+    
+    screen.setParent(parent);
+  };
+  
+  _.graphicsUpdate = function () {
+    if (screen) {
+      screen.update();
+    }
+    
+    frames += 1;
+  };
+  
   exports.install(exports);
-}(micro.graphics));
+}(micro.graphics, micro._.Screen, micro._.NAMED_COLORS, micro._));

@@ -1,7 +1,4 @@
-var micro            = micro || {};
-    micro.__graphics = micro.__graphics || {};
-
-(function (exports) {
+(function (exports, Sprite) {
   'use strict';
   
   
@@ -89,7 +86,7 @@ var micro            = micro || {};
     name = name.toString().toLowerCase();
     
     if (!this.sprites.hasOwnProperty(name) && (name.length > 0)) {
-      sprite = new micro.__graphics.Sprite(name, this);
+      sprite = new Sprite(name, this);
       this.sprites[name] = sprite;
       
       this.currentSprite = sprite;
@@ -141,4 +138,4 @@ var micro            = micro || {};
   };
   
   exports.install(exports);
-}(micro.__graphics));
+}(micro._, micro._.Sprite));

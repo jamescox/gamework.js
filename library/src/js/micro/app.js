@@ -8,11 +8,8 @@
      *  Frame rate control.
  */
 
-
-var micro     = micro || {};
-    micro.app = micro.app || {};
     
-(function (exports) {
+(function (exports, _) {
   'use strict';
  
   var loadingOverlay, state, mainloop, loadingJobs = 0, loopCallbacks = [];
@@ -222,7 +219,7 @@ var micro     = micro || {};
     
     ns.__onloadhandler = function (flatten, mainScript) {
       return function () {
-        micro.graphics.__onload(document.body);
+        _.graphicsOnLoad(document.body);
         
         if (flatten) {
           micro.types.install(window);
@@ -231,6 +228,7 @@ var micro     = micro || {};
           micro.math.install(window);
           micro.graphics.install(window);
           micro.app.install(window);
+          micro.sound.install(window);
         }
         
         loadingOverlay = document.createElement('div');
@@ -245,7 +243,7 @@ var micro     = micro || {};
         state = new StateManager();
         mainloop = new IntervalMainLoop([
             function () { state.update.call(state); }, 
-            micro.graphics.__update
+            _.graphicsUpdate
         ]);
         mainloop.startloadtask();
         mainloop.start();
@@ -261,4 +259,4 @@ var micro     = micro || {};
   };
   
   exports.install(exports);
-}(micro.app));
+}(micro.app, micro._));

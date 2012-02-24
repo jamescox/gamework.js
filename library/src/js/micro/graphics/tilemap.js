@@ -1,6 +1,3 @@
-var micro            = micro || {};
-    micro.__graphics = micro.__graphics || {};
-
 (function (exports) {
   'use strict';
   
@@ -13,4 +10,4 @@ var micro            = micro || {};
   };
   
   exports.install(exports);
-}(micro.__graphics));
+}(micro._));

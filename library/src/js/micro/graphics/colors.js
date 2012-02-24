@@ -1,8 +1,5 @@
-var micro            = micro || {};
-    micro.__graphics = micro.__graphics || {};
-
 // Taken from: http://news.e-scribe.com/361.  
-micro.__graphics.NAMED_COLORS = {
+micro._.NAMED_COLORS = {
   "aliceblue":            [240, 248, 255],
   "antiquewhite":         [250, 235, 215],
   "aquamarine":           [127, 255, 212],

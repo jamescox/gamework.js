@@ -10,9 +10,6 @@
      *  JSLint this module.
  */
 
-var micro      = micro || {};
-    micro.math = micro.math || {};
-
 (function (exports) {
   'use strict';
   
@@ -103,7 +100,8 @@ var micro      = micro || {};
             angleScale = SCALE_REV;
             angleUnit  = unit;
           }
-        }
+        },
+        enumerable: true
       }
     });
     

@@ -38,18 +38,22 @@
         if (modern) {
           // begin includes
           // this section will be replace in the final build.
+          document.write('<script src="js/micro/micro.js"><\/script>');
           document.write('<script src="js/micro/types.js"><\/script>');
           document.write('<script src="js/micro/string.js"><\/script>');
           document.write('<script src="js/micro/collections.js"><\/script>');
           document.write('<script src="js/micro/math.js"><\/script>');
           document.write('<script src="js/micro/input.js"><\/script>');
+          document.write('<script src="js/micro/sound.js"><\/script>');
           document.write('<script src="js/micro/graphics/colors.js"><\/script>');
-          document.write('<script src="js/micro/graphics/screen.js"><\/script>');
-          document.write('<script src="js/micro/graphics/layer.js"><\/script>');
           document.write('<script src="js/micro/graphics/tilemap.js"><\/script>');
           document.write('<script src="js/micro/graphics/sprite.js"><\/script>');
+          document.write('<script src="js/micro/graphics/layer.js"><\/script>');
+          document.write('<script src="js/micro/graphics/screen.js"><\/script>');
+          document.write('<script src="js/micro/graphics/tileset.js"><\/script>');
           document.write('<script src="js/micro/graphics/graphics.js"><\/script>');
           document.write('<script src="js/micro/app.js"><\/script>');
+          document.write('<script src="js/micro/micro-freeze.js"><\/script>');
           // end includes
           document.write("<script>" + 
             "(function () {" + 

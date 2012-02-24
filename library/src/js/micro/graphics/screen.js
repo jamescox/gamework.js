@@ -1,7 +1,4 @@
-var micro            = micro || {};
-    micro.__graphics = micro.__graphics || {};
-
-(function (exports) {
+(function (exports, Layer) {
   'use strict';
   
   function Screen(parent) {
@@ -124,7 +121,7 @@ var micro            = micro || {};
     name = name.toLowerCase();
     
     if (!this.layers.lookup.hasOwnProperty(name)) {
-      layer = new micro.__graphics.Layer(name, this);
+      layer = new Layer(name, this);
       
       this.layers.lookup[name] = layer;
       this.layers.order.push(layer);
@@ -145,4 +142,4 @@ var micro            = micro || {};
   };
   
   exports.install(exports);
-}(micro.__graphics));
+}(micro._, micro._.Layer));
