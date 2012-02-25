@@ -18,7 +18,7 @@
     </script>
     
     <script>
-      // Script ~voodoo~
+      // Script voodoo
       (function () {
         var modern = (function () {
           var canvas           = document.createElement('canvas'),
@@ -56,8 +56,8 @@
           document.write('<script src="js/micro/micro-freeze.js"><\/script>');
           // end includes
           document.write("<script>" + 
-            "(function () {" + 
-            "  window.onload = micro.app.__onloadhandler(true, 'app/main.js');" + 
+            "(function" + "()" +  "{" + 
+              "window.onload" + "=" + "micro.app.__onloadhandler(true," + "'app/main.js');" + 
             "}());" + 
             "<\/script>");
         } else {

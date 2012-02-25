@@ -93,7 +93,7 @@ BUILD_MODIFIED = mtime(TEMPLATE_DIR + ['index.html'])
 
 
 def compress_js(src):
-    p = Popen(['uglifyjs', '--reserved-names', 'Color,Vector'], stdin=PIPE, stdout=PIPE, shell=True)
+    p = Popen(['uglifyjs', '--inline-script', '--no-copyright', '--max-line-len', '1024', '--reserved-names', 'Color,Vector'], stdin=PIPE, stdout=PIPE)
 
     p.stdin.write(src)
     p.stdin.close()
@@ -120,7 +120,7 @@ class CompressingHtmlParser(HTMLParser):
             self.__in_script = True
             
         if tag == 'link':
-            code = '<style>' + self.__css_src + '</style>'
+            code = '<style>' + self.__css_src + '</style>\n'
         else:
             if attrs:
                 code = '<%s %s>' % (tag, attrs)
@@ -130,22 +130,27 @@ class CompressingHtmlParser(HTMLParser):
         self.__output.append(code)
     
     def handle_endtag(self, tag):
+        self.__output.append('</%s>' % tag)
+        
         if tag == 'script':
+            self.__output.append('\n')
             self.__in_script = False
             
-        self.__output.append('</%s>' % tag)
-    
     def handle_data(self, data):
         if self.__in_script:
             includes_begin = data.find('// begin includes')
             includes_end   = data.find('// end includes')
             
             if (includes_begin != -1) and (includes_end != -1):
-                code = json.dumps('<script>' + self.__js_src + '</script>')
-                code = "document.write(%s);" % code
-                data = data[:includes_begin] + code + data[includes_end:]
+                code  = json.dumps(['<script>'] + self.__js_src.split('\n') + ['</script>'])
+                #quote = code[0]
+                #code  = code.replace('\\n', '\\n' + quote + '+\n' + quote)
+                code  = r"document.write(%s.join('\n'));" % code
+                data  = data[:includes_begin] + code + data[includes_end:]
             
             data = compress_js(data)
+            if (includes_begin != -1) and (includes_end != -1):
+                data = data.replace('document.write([', 'document.write([\n').replace('].join("\\n")', '\n].join("\\n")')
         else:
             data = ' '.join(data.split())
             
@@ -214,7 +219,9 @@ def main(args):
     
 
     if SRC_MODIFIED > BUILD_MODIFIED:
-        js_src  = compress_js(build_js_sources())
+        js_src  = build_js_sources()
+        print(js_src)
+        js_src  = compress_js(js_src)
         css_src = compress_css(txtopen(CSS_SRC).read())
         
         html = build_html(js_src, css_src)
