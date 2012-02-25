@@ -17,8 +17,8 @@
   function loadScript(src, callback) {
     var scriptEl = document.createElement('script');
     
-    scriptEl.onload = callback;
-    scriptEl.src    = src;
+    scriptEl.onload  = callback;
+    scriptEl.src     = src;
     
     document.head.appendChild(scriptEl);
   }

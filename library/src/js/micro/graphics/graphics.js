@@ -256,8 +256,10 @@
       screen.layers.current.currentSprite.left(a);
     };
     
-    
-    
+    ns.moveto = function (arg1, arg2) {
+      screen.layers.current.currentSprite.moveTo(arg1, arg2);
+    };
+
     ns.color = color;
   };
   
