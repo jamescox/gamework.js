@@ -68,7 +68,7 @@
   // setSize(width, height)
   // setSize(vector(...))
   Screen.prototype.setSize = function (arg1, arg2) {
-    var v = micro.math.vector(arg1, arg2);
+    var self = this, v = micro.math.vector(arg1, arg2);
     
     if (v !== null) {
       this.config.size = v;
@@ -76,8 +76,12 @@
       this.els.page.style.width  = v.x + 'px';
       this.els.page.style.height = v.y + 'px';
       
-      this.els.page.style.marginLeft = -v.x / 2 + 'px'
-      this.els.page.style.marginTop  = -v.y / 2 + 'px'
+      this.els.page.style.marginLeft = -v.x / 2 + 'px';
+      this.els.page.style.marginTop  = -v.y / 2 + 'px';
+      
+      micro.collections.foreach(function (layer) { 
+        layer.onResize(); 
+      }, self.layers.order);
     }
   };
   
