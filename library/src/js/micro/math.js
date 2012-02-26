@@ -297,6 +297,20 @@
       return Math.max(lower, Math.min(upper, value));
     };
     
+    
+    // Functional utilities
+    ns.identity = function (value) { return value; };
+    
+    ns.curry = function (/* fn, arguments */) {
+      var fn = arguments[0], partargs = Array.prototype.slice.call(arguments, 1);
+      
+      return function () {
+        var restargs = Array.prototype.slice.call(arguments);
+        
+        return fn.apply(this, partargs.concat(restargs));
+      };
+    };
+    
     // Predicates.
     ns.isnan    = Math.isNaN;
     ns.isnumber = function (n) { return !Math.isNaN(n); };
