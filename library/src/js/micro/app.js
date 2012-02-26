@@ -78,6 +78,14 @@
     // When a state is poped of the stack.
   };
   
+  StateManager.prototype.change = function (name) {
+    if (this.stack.length === 0) {
+      this.push(name);
+    } else {
+      this.stack[this.stack.length - 1] = name;
+    }
+  };
+  
   function IntervalMainLoop(loopCallbacks) {
     this.running       = false;
     this.fps           = 30;
@@ -177,17 +185,20 @@
     
     Object.defineProperties(ns, {
       pushstate: {
-        value: function () {
+        value: function (name) {
+          state.push(name);
         }
       },
       
       popstate: {
         value: function () {
+          
         }
       },
       
       changestate: {
-        value: function () {
+        value: function (name) {
+          state.change(name);
         }
       }
     });
@@ -227,6 +238,7 @@
           micro.collections.install(window);
           micro.math.install(window);
           micro.graphics.install(window);
+          micro.input.install(window);
           micro.app.install(window);
           micro.sound.install(window);
         }
@@ -251,7 +263,6 @@
         window.clearInterval(window.__titleAnimation__);
         micro.app.title = 'Untitled Application';
         loadScript(mainScript, function () {
-          state.push(''); // The default state.
           mainloop.endloadtask();
         });
       };

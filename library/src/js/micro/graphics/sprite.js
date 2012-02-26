@@ -387,6 +387,8 @@
   // turnTo(targetAngle, maxDelta)
   // turnTo(targetAngle)
   Sprite.prototype.turnTo = function (targetAngle, maxDelta) {
+    var delta;
+    
     targetAngle = micro.math.torad(+targetAngle);
     
     if (typeof(maxDelta) !== 'undefined') {
@@ -397,7 +399,18 @@
     
     if (!(isNaN(targetAngle) || isNaN(maxDelta))) {
       if (isFinite(maxDelta)) {
-        // TODO
+        delta = targetAngle - this.angle;
+        if (delta < -Math.PI) {
+          delta = delta + Math.PI * 2;
+        } else if (delta > Math.PI) {
+          delta = delta - Math.PI * 2;
+        }
+        
+        if (delta >= 0) {
+          this.angle += Math.min(Math.abs(delta), maxDelta);
+        } else {
+          this.angle -= Math.min(Math.abs(delta), maxDelta);
+        }
       } else {
         this.angle = targetAngle;
       }
@@ -409,11 +422,85 @@
   // lookAt(vector(x, y), maxDelta)
   // lookAt(vector(x, y))
   Sprite.prototype.lookAt = function (arg1, arg2, arg3) {
-    var targetX, targetY, targetAngle, maxDelta;
+    var target, targetX, targetY, targetAngle, maxDelta = Infinity;
     
-    // TODO
+    if (typeof(arg1) !== 'undefined') {
+      if (typeof(arg2) !== 'undefined') {
+        if (typeof(arg3) !== 'undefined') {
+          // number, number, number
+          targetX  = +arg1;
+          targetY  = +arg2;
+          maxDelta = +arg3;
+        } else {
+          if (!(isNaN(arg1) || isNaN(arg2))) {
+            // number, number
+            targetX  = +arg1;
+            targetY  = +arg2;
+          } else {
+            // vector, number
+            target   = micro.math.vector(arg1);
+            
+            targetX  = target.x;
+            targetY  = target.y;
+            maxDelta = +arg2;
+          }
+        }
+      } else {
+        // vector
+        target   = micro.math.vector(arg1);
+        targetX  = target.x;
+        targetY  = target.y;
+      }
+    }
     
     if (!(isNaN(targetX) || isNaN(targetY) || isNaN(maxDelta))) {
+      targetAngle = micro.math.arctan2(
+          targetX - this.position.x, targetY - this.position.y);
+          
+      this.turnTo(targetAngle, maxDelta);
+    }
+  };
+  
+  // lookAway(x, y, maxDelta)
+  // lookAway(x, y)
+  // lookAway(vector(x, y), maxDelta)
+  // lookAway(vector(x, y))
+  Sprite.prototype.lookAway = function (arg1, arg2, arg3) {
+    var target, targetX, targetY, targetAngle, maxDelta = Infinity;
+    
+    if (typeof(arg1) !== 'undefined') {
+      if (typeof(arg2) !== 'undefined') {
+        if (typeof(arg3) !== 'undefined') {
+          // number, number, number
+          targetX  = +arg1;
+          targetY  = +arg2;
+          maxDelta = +arg3;
+        } else {
+          if (!(isNaN(arg1) || isNaN(arg2))) {
+            // number, number
+            targetX  = +arg1;
+            targetY  = +arg2;
+          } else {
+            // vector, number
+            target   = micro.math.vector(arg1);
+            
+            targetX  = target.x;
+            targetY  = target.y;
+            maxDelta = +arg2;
+          }
+        }
+      } else {
+        // vector
+        target   = micro.math.vector(arg1);
+        targetX  = target.x;
+        targetY  = target.y;
+      }
+    }
+    
+    if (!(isNaN(targetX) || isNaN(targetY) || isNaN(maxDelta))) {
+      targetAngle = micro.math.arctan2(
+          this.position.x - targetX, this.position.y - targetY);
+          
       this.turnTo(targetAngle, maxDelta);
     }
   };
@@ -432,6 +519,46 @@
   Sprite.prototype.right = Sprite.prototype.rotate;
   Sprite.prototype.left  = Sprite.prototype.rotatecc;
   // ...Angle
+  
+  // Size...
+  Sprite.prototype.getSize = function () {
+    return this.size;
+  };
+  
+  // setSize(x, y)
+  // setSize(vector(x, y))
+  Sprite.prototype.setSize = function (arg1, arg2) {
+    var size = vector(arg1, arg2);
+    
+    if (size !== null) {
+      this.size = size;
+    }
+  };
+  
+  Sprite.prototype.getWidth = function () {
+    return this.size.x;
+  };
+  
+  Sprite.prototype.setWidth = function (width) {
+    width = +width;
+    
+    if (!isNaN(width)) {
+      this.size = vector(width, this.size.y);
+    }
+  };
+  
+  Sprite.prototype.getHeight = function () {
+    return this.size.y;
+  };
+  
+  Sprite.prototype.setHeight = function (height) {
+    height = +height;
+    
+    if (!isNaN(height)) {
+      this.size = vector(this.size.x, height);
+    }
+  };
+  // ...Size
   
   // Skin...
   Sprite.prototype.getSkin = function () {

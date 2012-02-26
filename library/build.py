@@ -220,7 +220,6 @@ def main(args):
 
     if SRC_MODIFIED > BUILD_MODIFIED:
         js_src  = build_js_sources()
-        print(js_src)
         js_src  = compress_js(js_src)
         css_src = compress_css(txtopen(CSS_SRC).read())
         

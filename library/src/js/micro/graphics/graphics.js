@@ -213,6 +213,26 @@
           screen.layers.current.setCurrentSpriteName(name);
         },
         enumerable: true
+      },
+      
+      spritewidth: {
+        get: function () {
+          return screen.layers.current.currentSprite.getWidth();
+        },
+        set: function (width) {
+          return screen.layers.current.currentSprite.setWidth(width);
+        },
+        enumerable: true
+      },
+      
+      spriteheight: {
+        get: function () {
+          return screen.layers.current.currentSprite.getHeight();
+        },
+        set: function (height) {
+          return screen.layers.current.currentSprite.setHeight(height);
+        },
+        enumerable: true
       }
     });
   
@@ -250,6 +270,14 @@
     
     ns.right = function (a) {
       screen.layers.current.currentSprite.right(a);
+    };
+    
+    ns.lookat = function (arg1, arg2, arg3) {
+      screen.layers.current.currentSprite.lookAt(arg1, arg2, arg3);
+    };
+    
+    ns.lookaway = function (arg1, arg2, arg3) {
+      screen.layers.current.currentSprite.lookAway(arg1, arg2, arg3);
     };
     
     ns.left = function (a) {

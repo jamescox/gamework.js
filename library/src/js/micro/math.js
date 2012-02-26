@@ -1,12 +1,8 @@
-/*jslint browser: true, white: true, maxerr: 50, indent: 2 */
-
 /*  
     TODO:  
-     *  Add maths predicates.
      *  Implement mode.
      *  Implement median.  
      *  Add custom RNG to support seeding.
-     *  Add vector math functions.
      *  JSLint this module.
  */
 
@@ -31,9 +27,38 @@
     return 'vector(' + this.x + ', ' + this.y + ')';
   };
   
-  // TODO:  Add some vector math stuff here.
+  Vector.prototype.add = function (v2) {
+    return new Vector(this.x + v2.x, this.y + v2.y);
+  };
   
-
+  Vector.prototype.sub = function (v2) {
+    return new Vector(this.x - v2.x, this.y - v2.y);
+  };
+  
+  Vector.prototype.mul = function (v2) {
+    return new Vector(this.x * v2.x, this.y * v2.y);
+  };
+  
+  Vector.prototype.div = function (v2) {
+    return new Vector(this.x / v2.x, this.y / v2.y);
+  };
+  
+  Vector.prototype.dot = function (v2) {
+    return this.x * v2.x + this.y * v2.y;
+  };
+  
+  Vector.prototype.normal = function () {
+    return new Vector(this.x / this.m, this.y / this.m);
+  };
+  
+  Object.defineProperty(Vector.prototype, 'm', {
+    get: function () {
+      return Math.sqrt(this.x * this.x + this.y * this.y);
+    },
+    enumerable: true
+  });
+  
+  
   exports.install = function (ns) {
     // Constants.
     ns.pi = Math.PI;
@@ -267,6 +292,23 @@
     ns.normal = function (n) {
       return n === 0 ? 0 : n / micro.math.abs(n);
     };
+    
+    ns.bound = function (lower, value, upper) {
+      return Math.max(lower, Math.min(upper, value));
+    };
+    
+    // Predicates.
+    ns.isnan    = Math.isNaN;
+    ns.isnumber = function (n) { return !Math.isNaN(n); };
+    
+    ns.isfinite   = Math.isFinite;
+    ns.isinfinite = function (n) { return !Math.isFinite(n); };
+    
+    ns.isodd      = function (n) { return (n % 2) === 1; };
+    ns.iseven     = function (n) { return (n % 2) === 0; };
+    
+    ns.iszero     = function (n) { return n === 0; };
+    ns.isnonzero  = function (n) { return n !== 0; };
   };
   
   exports.install(exports);

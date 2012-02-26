@@ -1,4 +1,4 @@
-(function (exports, Layer) {
+(function (exports, Layer, _) {
   'use strict';
   
   function Screen(parent) {
@@ -34,6 +34,8 @@
     if (parent) {
       this.setParent(parent);
     }
+    
+    _.inputHook(null, this.els.border);
     
     this.newLayer('default');
   }
@@ -146,4 +148,4 @@
   };
   
   exports.install(exports);
-}(micro._, micro._.Layer));
+}(micro._, micro._.Layer, micro._));

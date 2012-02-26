@@ -49,10 +49,8 @@
     } else {
       sound = loadSound(name);
     }
-    
-    console.log(sound.currentSrc);
-    sound.currentTime = 0;
-    sound.play();
+
+    sound.cloneNode(true).play();
   }
   
   
