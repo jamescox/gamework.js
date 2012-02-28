@@ -4,7 +4,7 @@
 (function (exports, Screen, NAMED_COLORS, _) {
   'use strict';
   
-  var frames = 0, screen = null;
+  var frames = 0, screen = null, imageCache = {};
   
   
   function Color(r, g, b, a) {
@@ -16,7 +16,7 @@
     return 'color(' + this.r + ', ' + this.g + ', ' + this.b + ', ' + this.a + ')';
   };
   
-  Color.prototype.toCss = function () {
+  Color.prototype.tocss = function () {
     if (this.a !== 1) {
       return ('rgba(' + Math.floor(this.r * 255) + ',' + 
                         Math.floor(this.g * 255) + ',' + 
@@ -50,11 +50,15 @@
         // 1 argument, should be a color like object or color name.
         switch (micro.types.gettype(arg1)) {
         case 'string':
+          arg1 = arg1.trim();
+          
           if (NAMED_COLORS.hasOwnProperty(arg1.toLowerCase())) {
             r = NAMED_COLORS[arg1][0] / 255;
             g = NAMED_COLORS[arg1][1] / 255;
             b = NAMED_COLORS[arg1][2] / 255;
             a = 1;
+          } else if (arg1[0] === '#') {
+            // TODO:  CSS style colors. 
           }
           break;
         
@@ -165,12 +169,22 @@
         enumerable: true
       },
       
-      skin: {
+      spriteskin: {
         get: function () {
           return screen.layers.current.currentSprite.getSkin();
         },
         set: function (skin) {
           screen.layers.current.currentSprite.setSkin(skin);
+        },
+        enumerable: true
+      },
+      
+      spriteimage: {
+        get: function () {
+          return screen.layers.current.currentSprite.getImage();
+        },
+        set: function (image) {
+          screen.layers.current.currentSprite.setImage(image);
         },
         enumerable: true
       },
@@ -181,6 +195,16 @@
         },
         set: function (color) {
           screen.layers.current.currentSprite.setPenColor(color);
+        },
+        enumerable: true
+      },
+      
+      fillcolor: {
+        get: function () {
+          return screen.layers.current.currentSprite.getFillColor();
+        },
+        set: function (color) {
+          screen.layers.current.currentSprite.setFillColor(color);
         },
         enumerable: true
       },
@@ -288,6 +312,10 @@
       screen.layers.current.currentSprite.moveTo(arg1, arg2);
     };
 
+    ns.loadimage = function (path) {
+      _.loadImage(path);
+    };
+    
     ns.color = color;
   };
   
@@ -305,6 +333,50 @@
     }
     
     frames += 1;
+  };
+  
+  _.loadImage = function (path) {
+    var img;
+    
+    if (!imageCache.hasOwnProperty(path)) {
+      img = new Image();
+      
+      path = path + '';
+    
+      if (path) {
+        micro.app.startloadtask();
+        img.onload = function () {
+          imageCache[path].ready = true;
+          micro.app.endloadtask();
+        };
+        
+        img.onerror = function () {
+          // delete imageCache[path];
+          
+          micro.app.endloadtask();
+        };
+
+        img.src = 'app/' + path;
+        imageCache[path] = img;
+      }
+    }
+  };
+  
+  
+  _.getImage = function (path) {
+    var img;
+    
+    path = path + '';
+    
+    if (path) {
+      if (!imageCache.hasOwnProperty(path)) {
+        _.loadImage(path);
+      } 
+      
+      img = imageCache[path];
+    }
+    
+    return img;
   };
   
   exports.install(exports);

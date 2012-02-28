@@ -1,9 +1,10 @@
 (function (exports, _) {
   'use strict';
   
-  var keyEl = null, 
+  var keyEl   = null, 
       mouseEl = null,
-      mouseX = 0, mouseY = 0, mouseButtons = {};
+      mouseX  = 0,    mouseY = 0, mouseButtons = {},
+      keys    = {};
   
   
   exports.install = function (ns) {
@@ -23,10 +24,10 @@
     });
     
     ns.mousebutton = function (button) {
-      return mouseButtons[button];
+      return mouseButtons[button] || 0;
     };
     
-    ns.key = function (keyname) {
+    ns.keystate = function (keyname) {
     };
   };
   

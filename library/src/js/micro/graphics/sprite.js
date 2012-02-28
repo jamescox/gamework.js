@@ -44,7 +44,8 @@
     this.scale   = {x: 1, y: 1, both: 1};
     this.visible = true;
     this.skin    = 'arrow';
-    this.image   = 'arrow';
+    this.image   = '';
+    this.tile    = 0;
     
     // Behaviour / Animation.
     this.userUpdateFunction = null;
@@ -75,7 +76,7 @@
       g.scale(this.scale.x, this.scale.y);
       g.rotate(-this.angle);
       
-      switch (this.image) {
+      switch (this.skin) {
       case 'arrow':
         this.drawArrowSprite(g);
         break;
@@ -99,13 +100,12 @@
       case 'pacman':
         this.drawPacManSprite(g);
         break;
-        
 
       case 'ghost':
         this.drawGhostSprite(g);
         break;
         
-      default: // An image sprite.
+      case 'image':
         this.drawImageSprite(g);
         break;
       }
@@ -156,12 +156,12 @@
     g.fillText(this.name, w / 2 + 3, 0);
     
     g.translate(-w / 2 - 3 - r * 1.5, 0);
-    g.fillStyle = f.toCss();
+    g.fillStyle = f.tocss();
     g.beginPath();
     g.arc(0, 0, r, 0, Math.PI * 2);
     g.fill();
     
-    g.strokeStyle = s.toCss();
+    g.strokeStyle = s.tocss();
     g.lineWidth = this.pen.size;
     g.beginPath();
     g.arc(0, 0, r, 0, Math.PI * 2);
@@ -226,7 +226,20 @@
   };
   
   Sprite.prototype.drawImageSprite = function (g) {
-    // TODO
+    var img;
+    
+    if (this.image) {
+      img = exports.getImage(this.image);
+      
+      if (img.ready) {
+        g.save();
+    
+        g.scale(1, -1);
+        g.drawImage(img, -img.width / 2, -img.height / 2);
+        
+        g.restore();
+      }
+    }
   };
   
   Sprite.prototype.drawRectangleSprite = function (g) {
@@ -570,7 +583,18 @@
     
     if (skin) {
       this.skin  = skin;
-      this.image = skin;
+    }
+  };
+  
+  Sprite.prototype.getImage = function () {
+    return this.image;
+  };
+  
+  Sprite.prototype.setImage = function (image) {
+    image = image + '';
+    
+    if (image) {
+      this.image = image;
     }
   };
   // ...Skin
@@ -595,6 +619,7 @@
   Sprite.prototype.getPenColor = function () {
     return this.pen.color;
   };
+  
   // setPenColor(r, g, b, a)
   // setPenColor(color(...))
   Sprite.prototype.setPenColor = function (arg1, arg2, arg3, arg4) {
@@ -602,7 +627,22 @@
     
     if (c !== null) {
       this.pen.color    = c;
-      this.pen.cssColor = c.toCss();
+      this.pen.cssColor = c.tocss();
+    }
+  };
+  
+  Sprite.prototype.getFillColor = function () {
+    return this.pen.color;
+  };
+  
+  // setFillColor(r, g, b, a)
+  // setFillColor(color(...))
+  Sprite.prototype.setFillColor = function (arg1, arg2, arg3, arg4) {
+    var c = micro.graphics.color(arg1, arg2, arg3, arg4);
+    
+    if (c !== null) {
+      this.fill.color    = c;
+      this.fill.cssColor = c.tocss();
     }
   };
   // ...Color

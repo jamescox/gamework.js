@@ -98,7 +98,7 @@
     
     if (c !== null) {
       this.config.borderColor          = c;
-      this.els.border.style.background = c.toCss();
+      this.els.border.style.background = c.tocss();
     }
   };
   
@@ -114,7 +114,7 @@
     
     if (c !== null) {
       this.config.pageColor          = c;
-      this.els.page.style.background = c.toCss();
+      this.els.page.style.background = c.tocss();
     }
   };
   // ...Config

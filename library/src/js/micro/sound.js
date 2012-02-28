@@ -13,23 +13,26 @@
       sound.setAttribute('preload', 'preload');
       
       micro.app.startloadtask();
-      sound.oncanplay = micro.app.endloadtask;
+      sound.oncanplay = function () {
+        console.log('Using: ' + sound.currentSrc);
+        micro.app.endloadtask();
+      };
       
+      src = document.createElement('source');
+      src.setAttribute('src', 'app/' + name + '.ogg');
+      src.setAttribute('type', 'audio/ogg');
+      sound.appendChild(src);
+
+      src = document.createElement('source');
+      src.setAttribute('src', 'app/' + name + '.mp3');
+      src.setAttribute('type', 'audio/mp3');
+      sound.appendChild(src);
+            
       src = document.createElement('source');
       src.setAttribute('src', 'app/' + name + '.wav');
       src.setAttribute('type', 'audio/wav');
       sound.appendChild(src);
 
-      src = document.createElement('source');
-      src.setAttribute('src', 'app/' + name + '.ogg');
-      src.setAttribute('type', 'audio/vorbis');
-      sound.appendChild(src);
-      
-      src = document.createElement('source');
-      src.setAttribute('src', 'app/' + name + '.mp3');
-      src.setAttribute('type', 'audio/mp3');
-      sound.appendChild(src);
-      
       sound.load();
       
       sounds[name] = sound;
