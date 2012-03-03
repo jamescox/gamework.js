@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>JavaScript disabled</title>
+    <script>
+      (function () {
+        document.title = 'Loading';
+        window.__titleAnimation__ = window.setInterval(function () {
+          if (document.title.length < 10) {
+            document.title += '.';
+          } else {
+            document.title = 'Loading';
+          }
+        }, 500);
+      }());
+    </script>
+    
+    <script>
+      // Script voodoo
+      (function () {
+        var modern = (function () {
+          var canvas           = document.createElement('canvas'),
+              objectProperties = typeof(Object.defineProperties) === 'function',
+              objectFreeze     = typeof(Object.freeze) === 'function',
+              canvasSupport    = typeof(canvas.getContext) === 'function',
+              contextSupport   = false;
+              
+          try {
+            canvas.getContext('2d');
+            contextSupport = true;
+          } catch (e) {}
+              
+          return objectProperties && canvasSupport && contextSupport;
+        }());
+        
+        if (modern) {
+          // begin includes
+          // this section will be replace in the final build.
+          document.write('<script src="js/gamework/gamework-begin.js"><\/script>');
+          document.write('<script src="js/gamework/private-utils.js"><\/script>');
+          document.write('<script src="js/gamework/types.js"><\/script>');
+          document.write('<script src="js/gamework/string.js"><\/script>');
+          document.write('<script src="js/gamework/collections.js"><\/script>');
+          document.write('<script src="js/gamework/math.js"><\/script>');
+          document.write('<script src="js/gamework/input.js"><\/script>');
+          document.write('<script src="js/gamework/sound.js"><\/script>');
+          document.write('<script src="js/gamework/graphics/colors.js"><\/script>');
+          document.write('<script src="js/gamework/graphics/tilemap.js"><\/script>');
+          document.write('<script src="js/gamework/graphics/sprite.js"><\/script>');
+          document.write('<script src="js/gamework/graphics/layer.js"><\/script>');
+          document.write('<script src="js/gamework/graphics/screen.js"><\/script>');
+          document.write('<script src="js/gamework/graphics/tileset.js"><\/script>');
+          document.write('<script src="js/gamework/graphics/graphics.js"><\/script>');
+          document.write('<script src="js/gamework/game.js"><\/script>');
+          document.write('<script src="js/gamework/gamework-end.js"><\/script>');
+          // end includes
+          document.write("<script>" + 
+            "(function" + "()" +  "{" + 
+              "window.onload" + "=" + "gamework.game.__onloadhandler(true," + "'game/main.js');" + 
+            "}());" + 
+            "<\/script>");
+        } else {
+          window.onload = function () {
+            window.clearInterval(window.__titleAnimation__);
+            
+            document.title = 'Browser insufficiently modern';
+            document.body.innerHTML = ('<div class="gw-error">' + 
+                '<h1>Browser insufficiently modern<\/h1>' + 
+                '<p>' + 
+                  'The browser you are using to run this game ' + 
+                  'does not support some of these required technologies:' +
+                  '<ul>' +
+                    '<li><p>ECMAScript 5' + 
+                      '<ul><li>Object.defineProperties<\/li><\/ul>' +
+                      '<ul><li>Object.freeze<\/li><\/ul>' +
+                    '<\/p><\/li>' +
+                    '<li><p>HTML5' + 
+                      '<ul><li>canvas element and 2D drawing context<\/li><\/ul>' +
+                    '<\/p><\/li>' +
+                  '<\/ul>' +
+                '<\/p>' +
+                '<p>' +
+                  'To run this game please upgrade your ' + 
+                  'web browser.' + 
+                '<\/p>' +
+              '<\/div>');
+          };
+        }
+      }());
+    </script>
+
+    <link rel="stylesheet" href="css/gamework.css">
+  </head>
+  <body>
+    <noscript class="gw">
+      <div class="gw-error">
+        <h1>JavaScript disabled</h1>
+        <p>
+          This game requires JavaScript to run.  Either your
+          browser dosn't support it, in which case you will need to 
+          upgrade to a more modern browser, or you have it disabled.
+          Please enable JavaScript to run this game, thank you.
+        </p>
+      </div>
+    </noscript>
+  </body>
+</html>

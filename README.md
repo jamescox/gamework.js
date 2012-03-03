@@ -1,12 +1,12 @@
-micro.js
-========
+gamework.js
+===========
 
 Intorduction
 ------------
-micro.js is a simple 
-[JavaScript](http://en.wikipedia.org/wiki/JavaScript) library for 
-creating small [HTML5](http://en.wikipedia.org/wiki/Html5) rich internet 
-applications.  It is intended for use by beginner programmers that have 
+gamework.js is a simple 
+[JavaScript](http://en.wikipedia.org/wiki/JavaScript) framework for 
+creating small [HTML5](http://en.wikipedia.org/wiki/Html5) computer
+games.  It is intended for use by beginner programmers that have 
 no prior knowledge of computer programming.  The environment it provides 
 is very much inspired by the minimal programming environments of the 
 [microcomputers](http://en.wikipedia.org/wiki/Amstrad_CPC) from the 
@@ -35,10 +35,3 @@ Guidelines
  *  Use best practice when it dosn't get in the way of the previous 
     guide lines.
 
-
-What micro.js provides
-----------------------
-
-
-Contributing
-------------
