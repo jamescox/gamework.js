@@ -189,6 +189,36 @@
     return name;
   };
   
+  
+  Layer.prototype.removeSprite = function (name) {
+    var sprite, removedName = '';
+    
+    if (typeof(name) === 'undefined') {
+      name = this.currentSprite.name;
+    }
+    
+    name = _.validateId(name).toLowerCase();
+    
+    if (name !== '') {
+      if (micro.collections.len(this.sprites) > 1) {
+        if (this.sprites.hasOwnProperty(name)) {
+          sprite = this.sprites[name];
+          
+          delete this.sprites[name];
+          
+          if (this.currentSprite === sprite) {
+            this.currentSprite = micro.collections.values(this.sprites)[0];
+          }
+          
+          removedName = sprite.name;
+        }
+      }
+    }
+    
+    return removedName;
+  };
+  
+  
   Layer.prototype.getCurrentSpriteName = function () {
     return this.currentSprite.name;
   };
@@ -222,6 +252,10 @@
     this.gfx.sprites.setTransform(1, 0, 0, 1, 0, 0);
     this.gfx.sprites.translate(Math.floor(size.x / 2), Math.floor(size.y / 2));
     this.gfx.sprites.scale(1, -1);
+  };
+  
+  Layer.prototype.getSpritesByName = function () {
+    return micro.collections.keys(this.sprites);
   };
   
   Layer.prototype.clear = function () {

@@ -290,6 +290,13 @@
         enumerable: true
       },
       
+      allsprites: {
+        get: function () {
+          return screen.getCurrentLayer().getSpritesByName();
+        },
+        enumerable: true
+      },
+      
       currentsprite: {
         get: function () {
           return screen.layers.current.getCurrentSpriteName();
@@ -386,6 +393,25 @@
   
     ns.newsprite = function (name) {
       return screen.layers.current.newSprite(name);
+    };
+    
+    ns.removesprite = function (name) {
+      return screen.getCurrentLayer().removeSprite(name);
+    };
+    
+    ns.renamesprite = function (arg1, arg2) {
+      var sprite;
+      
+      if (typeof(arg2) === 'undefined') {
+        return screen.getCurrentLayer().currentSprite.rename(arg1);
+      } else {
+        sprite = screen.getCurrentLayer().sprites[_.validateId(arg1).toLowerCase()];
+        if (sprite) {
+          return sprite.rename(arg2);
+        } else {
+          return '';
+        }
+      }
     };
   
     ns.show = function () {

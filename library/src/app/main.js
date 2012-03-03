@@ -4,13 +4,4 @@
 //        template main.js file.
 
 
-spriteskin = 'ghost'; fillcolor = '#0f0'; show();
 
-newlayer('top');
-spriteskin = 'ghost'; fillcolor = '#f00'; show();
-
-currentlayer = 'default';
-newlayer('bottom', 'below');
-spriteskin = 'ghost'; fillcolor = '#00f'; show();
-
-currentlayer = 'default';

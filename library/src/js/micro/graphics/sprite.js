@@ -59,6 +59,25 @@
     this.data = {};
   }
   
+  
+  Sprite.prototype.rename = function (name) {
+    var nameCi;
+    
+    name   = exports.validateId(name);
+    nameCi = name.toLowerCase();
+    
+    if ((name !== '') && !this.layer.sprites.hasOwnProperty(nameCi)) {
+      delete this.layer.sprites[this.name.toLowerCase()];
+      
+      this.layer.sprites[nameCi] = this;
+      
+      this.name = name;
+    }
+  
+    return this.name;
+  };
+  
+  
   // Sprite rendering...
   Sprite.prototype.update = function (g) {
     var previousCurrentSprite = this.layer.currentSprite;
