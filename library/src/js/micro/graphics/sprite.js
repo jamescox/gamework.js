@@ -97,7 +97,7 @@
         this.drawCircleSprite(g);
         break;
       
-      case 'pacman':
+      case 'pac-man':
         this.drawPacManSprite(g);
         break;
 
@@ -294,11 +294,79 @@
   };
   
   Sprite.prototype.drawPacManSprite = function (g) {
-    // TODO
+    var r = Math.min(this.size.x, this.size.y) / 2, 
+        a = 0.125 * Math.max(0, 1 + Math.sin((+(new Date()) / 250) * Math.PI));
+    
+    g.scale(1, -1);
+    g.rotate(-Math.PI / 2);
+    g.fillStyle = this.fill.cssColor;
+    g.beginPath();
+    g.moveTo(0, 0);
+    g.arc(0, 0, r, Math.PI * a, Math.PI * (2 - a));
+    g.lineTo(0, 0);
+    g.fill();
   };
   
   Sprite.prototype.drawGhostSprite = function (g) {
-    // TODO
+    var r    = Math.min(this.size.x, this.size.y) / 2,
+        r2   = r / 8,
+        eyeR = r / (this.tile === 'scared' ? 5 : 3.5);
+    
+    // Body
+    g.scale(1, -1);
+    g.rotate(-this.angle);
+    g.fillStyle = this.fill.cssColor;
+    g.beginPath();
+    g.arc(0, 0, r, Math.PI, Math.PI * 2);
+    
+    g.arc((r / 3) * 2, (r / 3) * 2, r / 3, 0, Math.PI);
+    g.arc(0, (r / 3) * 2, r / 3, 0, Math.PI);
+    g.arc(-(r / 3) * 2, (r / 3) * 2, r / 3, 0, Math.PI);
+    g.fill();
+    
+    // Eyes
+    g.save();
+    g.fillStyle = 'white';
+    g.translate(0, -r / 6);
+    g.rotate(this.angle);
+    g.translate(0, -r / (this.tile === 'scared' ? 20 : 6));
+    g.rotate(-this.angle);
+    g.translate(-r / 3, 0);
+    g.beginPath();
+    g.arc(0, 0, eyeR, 0, Math.PI * 2);
+    g.arc((r / 3) * 2, 0, eyeR, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+    
+    if (this.tile !== 'scared') {
+      // Pupils
+      g.fillStyle = this.pen.cssColor;
+      g.translate(0, -r / 6);
+      g.rotate(this.angle);
+      g.translate(0, -r / 3.5);
+      g.rotate(-this.angle);
+      g.translate(-r / 3, 0);
+      g.beginPath();
+      g.arc(0, 0, r / 9, 0, Math.PI * 2);
+      g.arc((r / 3) * 2, 0, r / 9, 0, Math.PI * 2);
+      g.fill();
+    } else {
+      // Mouth
+      g.lineWidth = r / 10;
+      g.strokeStyle = 'white';
+      g.translate(0, r / 3);
+      g.beginPath();
+      g.moveTo(-r2 * 4, r2);
+      g.lineTo(-r2 * 3, 0);
+      g.lineTo(-r2 * 2, r2);
+      g.lineTo(-r2 * 1, 0);
+      g.lineTo(0, r2);
+      g.lineTo(r2 * 1, 0);
+      g.lineTo(r2 * 2, r2);
+      g.lineTo(r2 * 3, 0);
+      g.lineTo(r2 * 4, r2);
+      g.stroke();
+    }
   };
   // ...Sprite rendering
   
@@ -311,7 +379,7 @@
   // setPosition(x, y)
   // setPosition(vector(x, y))
   Sprite.prototype.setPosition = function (arg1, arg2) {
-    var pos = micro.graphics.vector(arg1, arg2);
+    var pos = micro.math.vector(arg1, arg2);
     
     if (pos !== null) {
       this.position = pos;
@@ -327,16 +395,22 @@
   };
   
   Sprite.prototype.setX = function (x) {
+    var oldPos = this.position;
+    
     x = +x;
+    
     if (!isNaN(x) && isFinite(x)) {
-      this.position.x = x;
+      this.position = micro.math.vector(x, oldPos.y);
     }
   };
   
   Sprite.prototype.setY = function (y) {
+    var oldPos = this.position;
+    
     y = +y;
+    
     if (!isNaN(y) && isFinite(y)) {
-      this.position.y = y;
+      this.position = micro.math.vector(oldPos.x, y);
     }
   };
   
@@ -579,10 +653,19 @@
   };
   
   Sprite.prototype.setSkin = function (skin) {
-    skin = skin.toString();
+    skin = skin.toString().toLowerCase();
     
-    if (skin) {
-      this.skin  = skin;
+    if (micro.collections.contains([
+      'arrow', 
+      'circle', 
+      'ellipse', 
+      'square', 
+      'rectangle', 
+      'pac-man',
+      'ghost',
+      'image',
+      'tile'], skin)) {
+      this.skin = skin;
     }
   };
   
@@ -595,6 +678,18 @@
     
     if (image) {
       this.image = image;
+    }
+  };
+  
+  Sprite.prototype.getTile = function () {
+    return this.tile;
+  };
+  
+  Sprite.prototype.setTile = function (tile) {
+    tile = tile + '';
+    
+    if (tile) {
+      this.tile = tile;
     }
   };
   // ...Skin
@@ -696,7 +791,23 @@
     this.visible = false; 
   };
   // ...Visibility
-    
+  
+  
+  Sprite.prototype.otherSpritesName = function (multiLayer) {
+    multiLayer = !!multiLayer;
+  };
+  
+  
+  Sprite.prototype.closestSpriteName = function (multiLayer) {
+    multiLayer = !!multiLayer;
+  };
+  
+  
+  // Drawing...
+  
+  // TODO
+  
+  // ...Drawing
   
   exports.install = function (ns) {
     ns.Sprite = Sprite;

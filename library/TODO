@@ -6,9 +6,11 @@ Keyboard input
 Sound + Music
 API refactor, names specifically.
 Documentation
-Add support for extended css style hex colors #fff, #ffff, #ffffff, #ffffffff
 Come up with a new name for this project as it is already taken...
-Simple physics / Box2D physics
+Simple physics / Box2D physics (this might be over kill)
+DOM to reflect ids of layers.
+Validate IDs (JS Identifiers non-unicode) for sprites and layers, make sprites have two ID's layerId.spriteId and just spriteId
+Layer + Sprite ID's are case insenstive but retain case
 
 WISH LIST
 =========

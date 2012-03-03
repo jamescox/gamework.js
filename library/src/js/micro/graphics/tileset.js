@@ -1,19 +1,10 @@
-(function (exports) {
+(function (exports, priv) {
   'use strict';
   
   var tilesets = {};
   
   
-  function wrapIndex(index, bound) {
-    if (index >= 0) {
-      index = index % bound;
-    } else {
-      // TODO:  This works but I'm sure it could be simplified.
-      index = (bound - (Math.abs(index) % bound)) % bound;
-    }
-    
-    return index;
-  } 
+  
   
   
   function TileSet(name) {
@@ -22,8 +13,10 @@
   
   
   exports.install = function (ns) {
-    ns.TileSet = TileSet;
+    // newtileset(name : string, image : string, framewidth : number, frameheight : number, originx : number, originy : number)
+    ns.newtileset = function (name, image, framewidth, frameheight, originx, originy) {
+    };
   };
   
   exports.install(exports);
-}(micro._));
+}(micro.graphics, micro._));

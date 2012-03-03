@@ -1,4 +1,4 @@
-(function (exports, Sprite) {
+(function (exports, Sprite, _) {
   'use strict';
   
   
@@ -52,6 +52,16 @@
   };
   
   
+  // Z-Order...
+  Layer.prototype.moveUp = function () {
+  };
+  
+  // TODO
+  
+  Layer.prototype.moveDown = function () {
+  };
+  // ...Z-Order
+  
   Layer.prototype.update = function () {
     var layer = this;
     
@@ -67,7 +77,7 @@
     var name;
     
     do {
-      name = '<' + this.nextSpriteId + '>';
+      name = '$' + this.nextSpriteId + '$';
       
       this.nextSpriteId += 1;
     } while (this.sprites.hasOwnProperty(name));
@@ -77,24 +87,25 @@
   
   
   Layer.prototype.newSprite = function (name) {
-    var sprite;
+    var sprite, nameCi;
     
-    if (typeof(name) === 'undefined') {
+    if (!name) {
       name = this.generateSpriteName();
     }
     
-    name = name.toString().toLowerCase();
+    name   = _.validateId(name);
+    nameCi = name.toLowerCase();
     
-    if (!this.sprites.hasOwnProperty(name) && (name.length > 0)) {
-      sprite = new Sprite(name, this);
-      this.sprites[name] = sprite;
-      
-      this.currentSprite = sprite;
-      
-      return name;
+    if (name !== '') {
+      if (!this.sprites.hasOwnProperty(nameCi) && (name.length > 0)) {
+        sprite = new Sprite(name, this);
+        this.sprites[nameCi] = sprite;
+        
+        this.currentSprite = sprite;
+      }
     }
     
-    return null;
+    return name;
   };
   
   Layer.prototype.getCurrentSpriteName = function () {
@@ -102,12 +113,11 @@
   };
   
   Layer.prototype.setCurrentSpriteName = function (name) {
-    if (typeof(name) !== 'undefined') {
-      name = name.toString().toLowerCase();
-      if (name.length > 0) {
-        if (this.sprites.hasOwnProperty(name)) {
-          this.currentSprite = this.sprites[name];
-        }
+    name = _.validateId(name).toLowerCase();
+    
+    if (name !== '') {
+      if (this.sprites.hasOwnProperty(name)) {
+        this.currentSprite = this.sprites[name];
       }
     }
   };
@@ -133,9 +143,18 @@
     this.gfx.sprites.scale(1, -1);
   };
   
+  Layer.prototype.clear = function () {
+    var g = this.gfx.paper;
+    
+    g.save();
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.clearRect(0, 0, g.canvas.width, g.canvas.height);
+    g.restore();
+  };
+  
   exports.install = function (ns) {
     ns.Layer = Layer;
   };
   
   exports.install(exports);
-}(micro._, micro._.Sprite));
+}(micro._, micro._.Sprite, micro._));

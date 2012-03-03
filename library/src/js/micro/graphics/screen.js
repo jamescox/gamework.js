@@ -121,7 +121,7 @@
   
   
   // Layers...
-  Screen.prototype.newLayer = function (name) {
+  Screen.prototype.newLayer = function (name, aboveBelow) {
     var layer;
     
     name = name.toLowerCase();
@@ -140,6 +140,20 @@
     }
     
     return layer.name;
+  };
+  
+  Screen.prototype.getCurrentLayer = function () {
+    return this.layers.current;
+  };
+  
+  Screen.prototype.setCurrentLayer = function (layer) {
+    if (micro.collections.contains(this.layers.order, layer)) {
+      this.layers.current = layer;
+    }
+  };
+  
+  Screen.prototype.setCurrentLayerByName = function (name) {
+    // TODO
   };
   // ...Layers
   

@@ -1,4 +1,6 @@
 (function () {
+  micro.validateid = micro._.validateId;
+
   delete micro._;
 
   Object.freeze(window.micro            );

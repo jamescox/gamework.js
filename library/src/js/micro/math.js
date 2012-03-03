@@ -297,6 +297,23 @@
       return Math.max(lower, Math.min(upper, value));
     };
     
+    ns.wrapint = function (index, bound) {
+      index = Math.floor(index);
+      bound = Math.floor(bound);
+      
+      if (isFinite(index) && isFinite(bound)) {
+        if (index >= 0) {
+          index = index % bound;
+        } else {
+          // TODO:  This works but I'm sure it could be simplified.
+          index = (bound - (Math.abs(index) % bound)) % bound;
+        }
+        
+        return index;
+      } else {
+        return NaN;
+      }
+    } 
     
     // Functional utilities
     ns.identity = function (value) { return value; };

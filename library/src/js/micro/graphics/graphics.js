@@ -58,7 +58,31 @@
             b = NAMED_COLORS[arg1][2] / 255;
             a = 1;
           } else if (arg1[0] === '#') {
-            // TODO:  CSS style colors. 
+            if (arg1.length === 4) {
+              // #rgb
+              r = parseInt(arg1[1], 16) / 15;
+              g = parseInt(arg1[2], 16) / 15;
+              b = parseInt(arg1[3], 16) / 15;
+              a = 1;
+            } else if (arg1.length === 5) {
+              // #rgba
+              r = parseInt(arg1[1], 16) / 15;
+              g = parseInt(arg1[2], 16) / 15;
+              b = parseInt(arg1[3], 16) / 15;
+              a = parseInt(arg1[4], 16) / 15;
+            } else if (arg1.length === 7) {
+              // #rrggbb
+              r = parseInt(arg1[1] + arg1[2], 16) / 255;
+              g = parseInt(arg1[3] + arg1[4], 16) / 255;
+              b = parseInt(arg1[5] + arg1[6], 16) / 255;
+              a = 1;
+            } else if (arg1.length === 9) {
+              // #rrggbbaa
+              r = parseInt(arg1[1] + arg1[2], 16) / 255;
+              g = parseInt(arg1[3] + arg1[4], 16) / 255;
+              b = parseInt(arg1[5] + arg1[6], 16) / 255;
+              a = parseInt(arg1[7] + arg1[8], 16) / 255;
+            }
           }
           break;
         
@@ -189,6 +213,16 @@
         enumerable: true
       },
       
+      spritetile: {
+        get: function () {
+          return screen.layers.current.currentSprite.getTile();
+        },
+        set: function (tile) {
+          screen.layers.current.currentSprite.setTile(tile)
+        },
+        enumerable: true
+      },
+      
       pencolor: {
         get: function () {
           return screen.layers.current.currentSprite.getPenColor();
@@ -229,7 +263,7 @@
         enumerable: true
       },
       
-      sprite: {
+      currentsprite: {
         get: function () {
           return screen.layers.current.getCurrentSpriteName();
         },
@@ -255,6 +289,26 @@
         },
         set: function (height) {
           return screen.layers.current.currentSprite.setHeight(height);
+        },
+        enumerable: true
+      },
+      
+      spritex: {
+        get: function () {
+          return screen.layers.current.currentSprite.getX();
+        },
+        set: function (x) {
+          return screen.layers.current.currentSprite.setX(x);
+        },
+        enumerable: true
+      },
+      
+      spritey: {
+        get: function () {
+          return screen.layers.current.currentSprite.getY();
+        },
+        set: function (y) {
+          return screen.layers.current.currentSprite.setY(y);
         },
         enumerable: true
       }
@@ -314,6 +368,15 @@
 
     ns.loadimage = function (path) {
       _.loadImage(path);
+    };
+    
+    ns.home = function () {
+      screen.layers.current.currentSprite.setPosition(0, 0);
+      screen.layers.current.currentSprite.setAngle(0);
+    };
+    
+    ns.clear = function () {
+      screen.layers.current.clear();
     };
     
     ns.color = color;
