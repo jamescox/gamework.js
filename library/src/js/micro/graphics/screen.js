@@ -21,7 +21,7 @@
       page:   document.createElement('div')
     };
     
-    this.els.border.setAttribute('class', 'micro-border');
+    this.els.border.setAttribute('class', 'micro-screen');
     this.els.page.setAttribute('class', 'micro-page');    
     
     this.els.border.appendChild(this.els.page);
@@ -121,25 +121,109 @@
   
   
   // Layers...
+  Screen.prototype.recalcLayersZ = function () {
+    var i;
+    
+    for (i = 0; i < this.layers.order.length; i += 1) {
+      this.layers.order[i].z = i;
+    }
+  }
+  
   Screen.prototype.newLayer = function (name, aboveBelow) {
-    var layer;
+    var i, layer, nameCi;
     
-    name = name.toLowerCase();
-    
-    if (!this.layers.lookup.hasOwnProperty(name)) {
-      layer = new Layer(name, this);
-      
-      this.layers.lookup[name] = layer;
-      this.layers.order.push(layer);
-      
-      this.els.page.appendChild(layer.els.container);
-      
-      if (this.layers.current === null) {
-        this.layers.current = layer;
+    if (typeof(aboveBelow) === 'undefined') {
+      aboveBelow = 'above';
+    } else {
+      aboveBelow = aboveBelow.trim().toLowerCase();
+      if ((aboveBelow !== 'above') && (aboveBelow !== 'below')) {
+        return '';
       }
     }
     
-    return layer.name;
+    name = _.validateId(name);
+    nameCi = name.toLowerCase();
+    
+    if (name !== '') {
+      if (!this.layers.lookup.hasOwnProperty(nameCi)) {
+        layer = new Layer(name, this);
+        
+        this.layers.lookup[nameCi] = layer;
+        
+        if (this.layers.current) {
+          if (aboveBelow === 'above') {
+            if (this.layers.current.els.container.nextSibling) {
+              this.els.page.insertBefore(
+                layer.els.container, 
+                this.layers.current.els.container.nextSibling);
+            } else {
+              this.els.page.appendChild(layer.els.container);
+            }
+            this.layers.order.splice(this.layers.current.z + 1, 0, layer);
+          } else {
+            this.els.page.insertBefore(
+              layer.els.container, 
+              this.layers.current.els.container);
+              
+            this.layers.order.splice(this.layers.current.z, 0, layer);
+          }
+        } else { 
+          // First layer (default).
+          this.els.page.appendChild(layer.els.container);
+          this.layers.order.push(layer);
+        }
+
+        this.layers.current = layer;
+        
+        this.recalcLayersZ();
+      } else {
+        name = '';
+      }
+    }
+    
+    return name;
+  };
+  
+  Screen.prototype.removeLayer = function (name) {
+    var nameCi, layer;
+    
+    if (this.layers.order.length > 1) {
+      if (typeof(name) === 'undefined') {
+        name = this.layers.current.name;
+      } else {
+        name = _.validateId(name);
+      }
+      
+      nameCi = name.toLowerCase();
+      
+      if (this.layers.lookup.hasOwnProperty(nameCi)) {
+        layer = this.layers.lookup[nameCi];
+        
+        delete this.layers.lookup[nameCi];
+        this.layers.order.splice(layer.z, 1);
+        
+        this.els.page.removeChild(layer.els.container);
+        
+        this.recalcLayersZ();
+        
+        if (this.layers.current === layer) {
+          this.layers.current = this.layers.order[
+            micro.math.bound(0, layer.z, this.layers.order.length - 1)];
+        }
+      } else {
+        name = '';
+      }
+    } else {
+      name = '';
+    }
+    
+    return name;
+  };
+  
+  Screen.prototype.getLayersByName = function () {
+    var self = this;
+    
+    return map(function (layer) { return layer.name; }, self.layers.order);
   };
   
   Screen.prototype.getCurrentLayer = function () {
@@ -153,7 +237,15 @@
   };
   
   Screen.prototype.setCurrentLayerByName = function (name) {
-    // TODO
+    name = _.validateId(name).toLowerCase();
+    
+    if (this.layers.lookup.hasOwnProperty(name)) {
+      this.layers.current = this.layers.lookup[name];
+    }
+  };
+  
+  Screen.prototype.getLayerCount = function () {
+    return this.layers.order.length;
   };
   // ...Layers
   

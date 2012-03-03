@@ -263,6 +263,33 @@
         enumerable: true
       },
       
+      alllayers: {
+        get: function () {
+          return screen.getLayersByName();
+        },
+        enumerable: true
+      },
+      
+      currentlayer: {
+        get: function () {
+          return screen.getCurrentLayer().name;
+        },
+        set: function (name) {
+          screen.setCurrentLayerByName(name);
+        },
+        enumerable: true
+      },
+      
+      layerz: {
+        get: function () {
+          return screen.getCurrentLayer().getZ();
+        },
+        set: function (z) {
+          screen.getCurrentLayer().setZ(z);
+        },
+        enumerable: true
+      },
+      
       currentsprite: {
         get: function () {
           return screen.layers.current.getCurrentSpriteName();
@@ -313,6 +340,45 @@
         enumerable: true
       }
     });
+  
+    ns.newlayer = function (name, abovebelow) {
+      return screen.newLayer(name, abovebelow);
+    };
+    
+    ns.removelayer = function (name) {
+      return screen.removeLayer(name);
+    };
+  
+    ns.renamelayer = function (arg1, arg2) {
+      var layer;
+      
+      if (typeof(arg2) === 'undefined') {
+        return screen.getCurrentLayer().rename(arg1);
+      } else {
+        layer = screen.layers.lookup[_.validateId(arg1).toLowerCase()];
+        if (layer) {
+          return layer.rename(arg2);
+        } else {
+          return '';
+        }
+      }
+    };
+  
+    ns.layertotop = function () {
+      return screen.getCurrentLayer().toTop();
+    };
+  
+    ns.layerup = function (by) {
+      return screen.getCurrentLayer().moveUp(by);
+    };
+  
+    ns.layerdown = function (by) {
+      return screen.getCurrentLayer().moveDown(by);
+    };
+    
+    ns.layertobottom = function () {
+      return screen.getCurrentLayer().toBottom();
+    };
   
     ns.resize = function (arg1, arg2) {
       screen.setSize(arg1, arg2);

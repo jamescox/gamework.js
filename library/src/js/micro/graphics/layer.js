@@ -30,6 +30,7 @@
       sprites:   document.createElement('canvas')
     };
     
+    this.els.container.setAttribute('id', 'layer-' + name);
     this.els.container.setAttribute('class', 'micro-layer');
     this.els.paper.setAttribute('class', 'micro-sublayer');
     this.els.tiles.setAttribute('class', 'micro-sublayer');
@@ -53,12 +54,90 @@
   
   
   // Z-Order...
-  Layer.prototype.moveUp = function () {
+  Layer.prototype.getZ = function () {
+    return this.z;
   };
   
-  // TODO
+  Layer.prototype.setZ = function (z) {
+    var nextLayer,
+        lastLayerIdx = this.screen.getLayerCount() - 1;
+ 
+    if (!isNaN(z)) {
+      z = micro.math.bound(0, +z, lastLayerIdx);
+      
+      if (z !== this.z) {
+        nextLayer = this.screen.layers.order[z + 1];
+      
+        this.screen.layers.order.splice(this.z, 1);
+        this.screen.els.page.removeChild(this.els.container);
+      
+        if (z === 0) {
+          // Move to the top.
+          this.screen.els.page.insertBefore(
+            this.els.container, this.screen.els.page.firstChild);
+          this.screen.layers.order.unshift(this);
+        } else if (z === lastLayerIdx) {
+          // Move to the bottom.
+          this.screen.els.page.appendChild(this.els.container);
+          this.screen.layers.order.push(this);
+        } else {
+          this.screen.els.page.insertBefore(
+            this.els.container, nextLayer.els.container);
+          this.screen.layers.order.splice(z, 0, this);
+        }
+      
+        this.screen.recalcLayersZ();
+      }
+    }
+  };
   
-  Layer.prototype.moveDown = function () {
+  
+  Layer.prototype.rename = function (name) {
+    var nameCi;
+    
+    name   = _.validateId(name);
+    nameCi = name.toLowerCase();
+    
+    if ((name !== '') && !this.screen.layers.lookup.hasOwnProperty(nameCi)) {
+      delete this.screen.layers.lookup[this.name.toLowerCase()];
+      
+      this.screen.layers.lookup[nameCi] = this;
+      
+      this.name = name;
+      
+      this.els.container.setAttribute('id', 'layer-' + name);
+    }
+    
+    return this.name;
+  };
+  
+  
+  Layer.prototype.toBottom = function () {
+    this.setZ(0);
+    
+    return this.z;
+  };
+    
+  Layer.prototype.moveDown = function (by) {
+    if (isFinite(by)) {
+      this.setZ(this.z - (+by));
+    }
+    
+    return this.z;
+  };
+  
+  Layer.prototype.moveUp = function (by) {
+    if (isFinite(by)) {
+      this.setZ(this.z + (+by));
+    }
+    
+    return this.z;
+  };
+
+  Layer.prototype.toTop = function () {
+    this.setZ(this.screen.getLayerCount() - 1);
+    
+    return this.z;
   };
   // ...Z-Order
   
@@ -97,11 +176,13 @@
     nameCi = name.toLowerCase();
     
     if (name !== '') {
-      if (!this.sprites.hasOwnProperty(nameCi) && (name.length > 0)) {
+      if (!this.sprites.hasOwnProperty(nameCi)) {
         sprite = new Sprite(name, this);
         this.sprites[nameCi] = sprite;
         
         this.currentSprite = sprite;
+      } else {
+        name = '';
       }
     }
     
