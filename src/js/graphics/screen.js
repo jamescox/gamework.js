@@ -6,8 +6,8 @@
     
     this.config = {
       size:        gamework.math.vector(400, 400),
-      borderColor: gamework.graphics.color(0.5, 0.5, 0.5),
-      pageColor:   gamework.graphics.color(0.5, 0.5, 0.5)
+      borderColor: gamework.graphics.color(0.55, 0.55, 0.55),
+      pageColor:   gamework.graphics.color(0.50, 0.50, 0.50)
     };
     
     this.layers = {
@@ -35,7 +35,7 @@
       this.setParent(parent);
     }
     
-    exports.inputHook(null, this.els.border);
+    exports.inputHook(window, this.els.border);
     
     this.newLayer('default');
   }
