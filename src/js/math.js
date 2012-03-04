@@ -4,6 +4,7 @@
      *  Implement median.  
      *  Add custom RNG to support seeding.
      *  JSLint this module.
+     *  Funtion equives for standard JS operators.
  */
 
 (function (exports) {

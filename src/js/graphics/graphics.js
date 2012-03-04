@@ -4,7 +4,7 @@
 (function (exports, Screen, NAMED_COLORS, _) {
   'use strict';
   
-  var frames = 0, screen = null, imageCache = {};
+  var oldInstall = exports.install, frames = 0, screen = null, imageCache = {};
   
   
   function Color(r, g, b, a) {
@@ -213,16 +213,6 @@
         enumerable: true
       },
       
-      spritetile: {
-        get: function () {
-          return screen.layers.current.currentSprite.getTile();
-        },
-        set: function (tile) {
-          screen.layers.current.currentSprite.setTile(tile)
-        },
-        enumerable: true
-      },
-      
       pencolor: {
         get: function () {
           return screen.layers.current.currentSprite.getPenColor();
@@ -303,6 +293,26 @@
         },
         set: function (name) {
           screen.layers.current.setCurrentSpriteName(name);
+        },
+        enumerable: true
+      },
+      
+      spritetile: {
+        get: function () {
+          return screen.layers.current.currentSprite.getTile();
+        },
+        set: function (tile) {
+          screen.layers.current.currentSprite.setTile(tile);
+        },
+        enumerable: true
+      },
+      
+      spritetileset: {
+        get: function () {
+          return screen.layers.current.currentSprite.getTileSet();
+        },
+        set: function (tileset) {
+          screen.layers.current.currentSprite.setTileSet(tileset);
         },
         enumerable: true
       },
@@ -472,6 +482,8 @@
     };
     
     ns.color = color;
+    
+    if (oldInstall) { oldInstall(ns); }
   };
   
   _.graphicsOnLoad = function (parent) {

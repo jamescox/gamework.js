@@ -45,7 +45,8 @@
     this.visible = true;
     this.skin    = 'arrow';
     this.image   = '';
-    this.tile    = 0;
+    this.tileset = '';
+    this.tile    = 1;
     
     // Behaviour / Animation.
     this.userUpdateFunction = null;
@@ -126,6 +127,10 @@
         
       case 'image':
         this.drawImageSprite(g);
+        break;
+        
+      case 'tileset':
+        this.drawTileSetSprite(g);
         break;
       }
       
@@ -385,6 +390,15 @@
       g.lineTo(r2 * 3, 0);
       g.lineTo(r2 * 4, r2);
       g.stroke();
+    }
+  };
+  
+  
+  Sprite.prototype.drawTileSetSprite = function (g) {
+    var tileset = exports.getTileSet(this.tileset);
+    
+    if (tileset !== null) {
+      tileset.drawIndexedTile(g, this.tile, this.size.x, this.size.y);
     }
   };
   // ...Sprite rendering
@@ -683,7 +697,7 @@
       'pac-man',
       'ghost',
       'image',
-      'tile'], skin)) {
+      'tileset'], skin)) {
       this.skin = skin;
     }
   };
@@ -705,10 +719,22 @@
   };
   
   Sprite.prototype.setTile = function (tile) {
-    tile = tile + '';
+    if (typeof(tile) !== 'number') {
+      tile = tile + '';
+    }
     
-    if (tile) {
-      this.tile = tile;
+    this.tile = tile;
+  };
+  
+  Sprite.prototype.getTileSet = function () {
+    return this.tileset;
+  };
+  
+  Sprite.prototype.setTileSet = function (tileset) {
+    tileset = exports.validateId(tileset);
+    
+    if (tileset !== '') {
+      this.tileset = tileset;
     }
   };
   // ...Skin

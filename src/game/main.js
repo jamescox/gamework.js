@@ -4,4 +4,9 @@
 //        template main.js file.
 
 
+newtileset('ground', 'img/ground.png', 40, 40, 0, 0);
 
+spriteskin    = 'tileset';
+spritetileset = 'ground';
+spritetile    = 1;
+show();
