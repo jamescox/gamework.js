@@ -12,4 +12,4 @@
       return '';
     }
   };
-}(gamework._));
+}(gamework.internal));

@@ -1,7 +1,7 @@
 /*jslint browser: true, white: true, nomen: true, maxerr: 50, indent: 2 */
 
 
-(function (exports, Screen, NAMED_COLORS, _) {
+(function (exports, internal) {
   'use strict';
   
   var oldInstall = exports.install, frames = 0, screen = null, imageCache = {};
@@ -17,16 +17,20 @@
   };
   
   Color.prototype.tocss = function () {
+    var css;
+    
     if (this.a !== 1) {
-      return ('rgba(' + Math.floor(this.r * 255) + ',' + 
-                        Math.floor(this.g * 255) + ',' + 
-                        Math.floor(this.b * 255) + ',' + 
-                        this.a + ')');
+      css = ('rgba(' + Math.floor(this.r * 255) + ',' + 
+                       Math.floor(this.g * 255) + ',' + 
+                       Math.floor(this.b * 255) + ',' + 
+                       this.a + ')');
     } else {
-      return ('rgb(' + Math.floor(this.r * 255) + ',' + 
-                        Math.floor(this.g * 255) + ',' + 
-                        Math.floor(this.b * 255) + ')');
+      css = ('rgb(' + Math.floor(this.r * 255) + ',' + 
+                       Math.floor(this.g * 255) + ',' + 
+                       Math.floor(this.b * 255) + ')');
     }
+    
+    return css;
   };
   
   function color(arg1, arg2, arg3, arg4) {
@@ -52,10 +56,10 @@
         case 'string':
           arg1 = arg1.trim();
           
-          if (NAMED_COLORS.hasOwnProperty(arg1.toLowerCase())) {
-            r = NAMED_COLORS[arg1][0] / 255;
-            g = NAMED_COLORS[arg1][1] / 255;
-            b = NAMED_COLORS[arg1][2] / 255;
+          if (internal.NAMED_COLORS.hasOwnProperty(arg1.toLowerCase())) {
+            r = internal.NAMED_COLORS[arg1][0] / 255;
+            g = internal.NAMED_COLORS[arg1][1] / 255;
+            b = internal.NAMED_COLORS[arg1][2] / 255;
             a = 1;
           } else if (arg1[0] === '#') {
             if (arg1.length === 4) {
@@ -193,6 +197,16 @@
         enumerable: true
       },
       
+      spriteopacity: {
+        get: function () {
+          return screen.layers.current.currentSprite.getOpacity();
+        },
+        set: function (opacity) {
+          screen.layers.current.currentSprite.setOpacity(opacity);
+        },
+        enumerable: true
+      },
+      
       spriteskin: {
         get: function () {
           return screen.layers.current.currentSprite.getSkin();
@@ -297,6 +311,26 @@
         enumerable: true
       },
       
+      spriteangle: {
+        get: function () {
+          return screen.layers.current.currentSprite.getAngle();
+        },
+        set: function (a) {
+          screen.layers.current.currentSprite.setAngle(a);
+        },
+        enumerable: true
+      },
+      
+      spriteposition: {
+        get: function () {
+          return screen.layers.current.currentSprite.getPosition();
+        },
+        set: function (p) {
+          screen.layers.current.currentSprite.setPosition(p);
+        },
+        enumerable: true
+      },
+      
       spritetile: {
         get: function () {
           return screen.layers.current.currentSprite.getTile();
@@ -337,6 +371,16 @@
         enumerable: true
       },
       
+      spritesize: {
+        get: function () {
+          return screen.layers.current.currentSprite.getSize();
+        },
+        set: function (size) {
+          return screen.layers.current.currentSprite.setSize(size);
+        },
+        enumerable: true
+      },
+      
       spritex: {
         get: function () {
           return screen.layers.current.currentSprite.getX();
@@ -367,18 +411,18 @@
     };
   
     ns.renamelayer = function (arg1, arg2) {
-      var layer;
+      var layer, newName = '';
       
       if (typeof(arg2) === 'undefined') {
-        return screen.getCurrentLayer().rename(arg1);
+        newName = screen.getCurrentLayer().rename(arg1);
       } else {
-        layer = screen.layers.lookup[_.validateId(arg1).toLowerCase()];
+        layer = screen.layers.lookup[internal.validateId(arg1).toLowerCase()];
         if (layer) {
-          return layer.rename(arg2);
-        } else {
-          return '';
+          newName = layer.rename(arg2);
         }
       }
+      
+      return newName;
     };
   
     ns.layertotop = function () {
@@ -410,18 +454,18 @@
     };
     
     ns.renamesprite = function (arg1, arg2) {
-      var sprite;
+      var sprite, newName = '';
       
       if (typeof(arg2) === 'undefined') {
-        return screen.getCurrentLayer().currentSprite.rename(arg1);
+        newName = screen.getCurrentLayer().currentSprite.rename(arg1);
       } else {
-        sprite = screen.getCurrentLayer().sprites[_.validateId(arg1).toLowerCase()];
+        sprite = screen.getCurrentLayer().sprites[internal.validateId(arg1).toLowerCase()];
         if (sprite) {
-          return sprite.rename(arg2);
-        } else {
-          return '';
+          newName = sprite.rename(arg2);
         }
       }
+      
+      return newName;
     };
   
     ns.show = function () {
@@ -448,6 +492,14 @@
       screen.layers.current.currentSprite.back(m);
     };
     
+    ns.rotate = function (a) {
+      screen.layers.current.currentSprite.rotate(a);
+    };
+    
+    ns.rotatecc = function (a) {
+      screen.layers.current.currentSprite.rotatecc(a);
+    };
+    
     ns.right = function (a) {
       screen.layers.current.currentSprite.right(a);
     };
@@ -469,12 +521,16 @@
     };
 
     ns.loadimage = function (path) {
-      _.loadImage(path);
+      internal.loadImage(path);
     };
     
     ns.home = function () {
       screen.layers.current.currentSprite.setPosition(0, 0);
       screen.layers.current.currentSprite.setAngle(0);
+    };
+    
+    ns.stamp = function () {
+      screen.layers.current.currentSprite.stamp();
     };
     
     ns.clear = function () {
@@ -486,15 +542,15 @@
     if (oldInstall) { oldInstall(ns); }
   };
   
-  _.graphicsOnLoad = function (parent) {
+  internal.graphicsOnLoad = function (parent) {
     if (screen === null) {
-      screen = new Screen();
+      screen = new internal.Screen();
     }
     
     screen.setParent(parent);
   };
   
-  _.graphicsUpdate = function () {
+  internal.graphicsUpdate = function () {
     if (screen) {
       screen.update();
     }
@@ -502,15 +558,13 @@
     frames += 1;
   };
   
-  _.loadImage = function (path) {
+  internal.loadImage = function (path) {
     var img;
     
     if (!imageCache.hasOwnProperty(path)) {
       img = new Image();
       
-      path = path + '';
-    
-      if (path) {
+      if ((typeof(path) === 'string') && (path !== '')) {
         gamework.game.startloadtask();
         img.onload = function () {
           imageCache[path].ready = true;
@@ -530,14 +584,12 @@
   };
   
   
-  _.getImage = function (path) {
+  internal.getImage = function (path) {
     var img;
-    
-    path = path + '';
-    
-    if (path) {
+
+    if ((typeof(path) === 'string') && (path !== '')) {
       if (!imageCache.hasOwnProperty(path)) {
-        _.loadImage(path);
+        internal.loadImage(path);
       } 
       
       img = imageCache[path];
@@ -547,4 +599,4 @@
   };
   
   exports.install(exports);
-}(gamework.graphics, gamework._.Screen, gamework._.NAMED_COLORS, gamework._));
+}(gamework.graphics, gamework.internal));

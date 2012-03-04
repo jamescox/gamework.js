@@ -24,9 +24,9 @@
     this.layer = layer;
     
     // Positional properties.
-    this.position = {x: 0, y: 0};
+    this.position = gamework.math.vector(0, 0);
     this.angle = 0;
-    this.size = {x: 40, y: 40}; 
+    this.size = gamework.math.vector(40, 40); 
     
     // Drawing properties.
     this.pen = {
@@ -42,7 +42,7 @@
     
     // Appearance properties.
     this.scale   = {x: 1, y: 1, both: 1};
-    this.visible = true;
+    this.visible = 1.0;
     this.skin    = 'arrow';
     this.image   = '';
     this.tileset = '';
@@ -89,12 +89,21 @@
       this.layer.currentSprite = previousCurrentSprite;
     }
     
-    if (this.visible) {
+    this.draw(g);
+    
+    // this.drawDebugInfo(g);
+  };
+  
+  
+  Sprite.prototype.draw = function (g) {
+    if (this.visible > 0.0) {
       g.save();
       
       g.translate(this.position.x, this.position.y);
       g.scale(this.scale.x, this.scale.y);
       g.rotate(-this.angle);
+      
+      g.globalAlpha = this.visible;
       
       switch (this.skin) {
       case 'arrow':
@@ -107,6 +116,7 @@
       
       case 'square':
         this.drawSquareSprite(g);
+
         break;
       
       case 'ellipse':
@@ -136,8 +146,6 @@
       
       g.restore();
     }
-    
-    // this.drawDebugInfo(g);
   };
   
   
@@ -821,19 +829,27 @@
   
   // Visibility...
   Sprite.prototype.isVisible = function () {
-    return this.visible;
+    return !!this.visible;
   };
   
   Sprite.prototype.setVisible = function (visible) {
-    this.visible = !!visible;
+    this.visible = !!visible ? 1.0 : 0.0;
+  };
+  
+  Sprite.prototype.getOpacity = function () {
+    return this.visible;
+  };
+  
+  Sprite.prototype.setOpacity = function (opacity) {
+    this.visible = gamework.math.bound(0, opacity, 1);
   };
   
   Sprite.prototype.show = function () { 
-    this.visible = true; 
+    this.visible = 1.0; 
   };
   
   Sprite.prototype.hide = function () { 
-    this.visible = false; 
+    this.visible = 0.0; 
   };
   // ...Visibility
   
@@ -852,6 +868,18 @@
   
   // TODO
   
+  Sprite.prototype.stamp = function () {
+    var g          = this.layer.gfx.paper,
+        oldOpacity = g.globalAlpha;
+    
+    g.save();
+    
+    this.draw(g);
+    
+    g.restore();
+    g.globalAlpha = oldOpacity;
+  };
+  
   // ...Drawing
   
   exports.install = function (ns) {
@@ -859,4 +887,4 @@
   };
   
   exports.install(exports);
-}(gamework._));
+}(gamework.internal));

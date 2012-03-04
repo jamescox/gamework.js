@@ -1,4 +1,4 @@
-(function (exports, Sprite, _) {
+(function (exports) {
   'use strict';
   
   
@@ -95,7 +95,7 @@
   Layer.prototype.rename = function (name) {
     var nameCi;
     
-    name   = _.validateId(name);
+    name   = exports.validateId(name);
     nameCi = name.toLowerCase();
     
     if ((name !== '') && !this.screen.layers.lookup.hasOwnProperty(nameCi)) {
@@ -172,12 +172,12 @@
       name = this.generateSpriteName();
     }
     
-    name   = _.validateId(name);
+    name   = exports.validateId(name);
     nameCi = name.toLowerCase();
     
     if (name !== '') {
       if (!this.sprites.hasOwnProperty(nameCi)) {
-        sprite = new Sprite(name, this);
+        sprite = new exports.Sprite(name, this);
         this.sprites[nameCi] = sprite;
         
         this.currentSprite = sprite;
@@ -197,7 +197,7 @@
       name = this.currentSprite.name;
     }
     
-    name = _.validateId(name).toLowerCase();
+    name = exports.validateId(name).toLowerCase();
     
     if (name !== '') {
       if (gamework.collections.len(this.sprites) > 1) {
@@ -224,7 +224,7 @@
   };
   
   Layer.prototype.setCurrentSpriteName = function (name) {
-    name = _.validateId(name).toLowerCase();
+    name = exports.validateId(name).toLowerCase();
     
     if (name !== '') {
       if (this.sprites.hasOwnProperty(name)) {
@@ -272,4 +272,4 @@
   };
   
   exports.install(exports);
-}(gamework._, gamework._.Sprite, gamework._));
+}(gamework.internal));

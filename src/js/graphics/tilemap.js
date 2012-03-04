@@ -10,4 +10,4 @@
   };
   
   exports.install(exports);
-}(gamework._));
+}(gamework.internal));

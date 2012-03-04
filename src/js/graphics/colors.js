@@ -1,5 +1,5 @@
 // Taken from: http://news.e-scribe.com/361.  
-gamework._.NAMED_COLORS = {
+gamework.internal.NAMED_COLORS = {
   "aliceblue":            [240, 248, 255],
   "antiquewhite":         [250, 235, 215],
   "aquamarine":           [127, 255, 212],

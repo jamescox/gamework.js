@@ -1,7 +1,5 @@
 (function () {
-  gamework.validateid = gamework._.validateId;
-
-  delete gamework._;
+  // delete gamework.internal;
 
   Object.freeze(window.gamework            );
   Object.freeze(window.gamework.game       );

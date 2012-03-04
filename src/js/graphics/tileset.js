@@ -1,4 +1,4 @@
-(function (exports, priv) {
+(function (exports, internal) {
   'use strict';
   
   var oldInstall = exports.install, tilesets = {};
@@ -12,7 +12,7 @@
     this.name       = name;
     
     this.imagename  = imagename
-    this.image      = priv.getImage(imagename);
+    this.image      = internal.getImage(imagename);
     
     this.tilewidth  = tilewidth;
     this.tileheight = tileheight;
@@ -67,7 +67,7 @@
     ns.newtileset = function (name, image, tilewidth, tileheight, originx, originy) {
       var nameCi, tileset;
       
-      name   = priv.validateId(name);
+      name   = internal.validateId(name);
       nameCi = name.toLowerCase();
       
       if (name !== '') {
@@ -89,8 +89,8 @@
     if (oldInstall) { oldInstall(ns); }
   };
   
-  priv.getTileSet = function (name) {
-    name = priv.validateId(name).toLowerCase();
+  internal.getTileSet = function (name) {
+    name = internal.validateId(name).toLowerCase();
     
     if ((name !== '') && tilesets.hasOwnProperty(name)) {
       return tilesets[name];
@@ -100,4 +100,4 @@
   };
   
   exports.install(exports);
-}(gamework.graphics, gamework._));
+}(gamework.graphics, gamework.internal));

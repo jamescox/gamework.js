@@ -9,7 +9,7 @@
  */
 
     
-(function (exports, _) {
+(function (exports, internal) {
   'use strict';
  
   var loadingOverlay, state, mainloop, loadingJobs = 0, loopCallbacks = [];
@@ -230,7 +230,7 @@
     
     ns.__onloadhandler = function (flatten, mainScript) {
       return function () {
-        _.graphicsOnLoad(document.body);
+        internal.graphicsOnLoad(document.body);
         
         if (flatten) {
           gamework.types.install(window);
@@ -255,7 +255,7 @@
         state = new StateManager();
         mainloop = new IntervalMainLoop([
             function () { state.update.call(state); }, 
-            _.graphicsUpdate
+            internal.graphicsUpdate
         ]);
         mainloop.startloadtask();
         mainloop.start();
@@ -270,4 +270,4 @@
   };
   
   exports.install(exports);
-}(gamework.game, gamework._));
+}(gamework.game, gamework.internal));

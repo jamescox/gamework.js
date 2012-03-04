@@ -1,8 +1,9 @@
 (function () {
+  'use strict';
+
   var module = {};
-  
-  module._ = {};
-  
+
+  module.internal    = {}; 
   module.game        = {};
   module.collections = {};
   module.graphics    = {};

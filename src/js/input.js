@@ -1,4 +1,4 @@
-(function (exports, _) {
+(function (exports, internal) {
   'use strict';
   
   var keyEl   = null, 
@@ -31,7 +31,7 @@
     };
   };
   
-  _.inputHook = function (keyel, mouseel) {
+  internal.inputHook = function (keyel, mouseel) {
     // Unhook previously hooked elements.
     if (mouseEl) {
     }
@@ -75,4 +75,4 @@
   };
   
   exports.install(exports);
-}(gamework.input, gamework._));
+}(gamework.input, gamework.internal));

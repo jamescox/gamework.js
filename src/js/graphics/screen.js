@@ -1,4 +1,4 @@
-(function (exports, Layer, _) {
+(function (exports) {
   'use strict';
   
   function Screen(parent) {
@@ -35,7 +35,7 @@
       this.setParent(parent);
     }
     
-    _.inputHook(null, this.els.border);
+    exports.inputHook(null, this.els.border);
     
     this.newLayer('default');
   }
@@ -141,12 +141,12 @@
       }
     }
     
-    name = _.validateId(name);
+    name = exports.validateId(name);
     nameCi = name.toLowerCase();
     
     if (name !== '') {
       if (!this.layers.lookup.hasOwnProperty(nameCi)) {
-        layer = new Layer(name, this);
+        layer = new exports.Layer(name, this);
         
         this.layers.lookup[nameCi] = layer;
         
@@ -191,7 +191,7 @@
       if (typeof(name) === 'undefined') {
         name = this.layers.current.name;
       } else {
-        name = _.validateId(name);
+        name = exports.validateId(name);
       }
       
       nameCi = name.toLowerCase();
@@ -237,7 +237,7 @@
   };
   
   Screen.prototype.setCurrentLayerByName = function (name) {
-    name = _.validateId(name).toLowerCase();
+    name = exports.validateId(name).toLowerCase();
     
     if (this.layers.lookup.hasOwnProperty(name)) {
       this.layers.current = this.layers.lookup[name];
@@ -254,4 +254,4 @@
   };
   
   exports.install(exports);
-}(gamework._, gamework._.Layer, gamework._));
+}(gamework.internal));
