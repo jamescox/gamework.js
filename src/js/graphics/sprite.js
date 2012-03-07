@@ -458,31 +458,51 @@
   // moveTo(x, y)
   // moveTo(vector(x, y))
   Sprite.prototype.moveTo = function (arg1, arg2) {
+    var pos = gamework.math.vector(arg1, arg2);
+    
+    if (pos !== null) {
+      this.position = pos;
+    }
+  };
+  
+  Sprite.prototype.lineTo = function (arg1, arg2) {
     var pos = gamework.math.vector(arg1, arg2), 
         g   = this.layer.gfx.paper;
     
     if (pos !== null) {
-      if (this.pen.down) {
-        g.strokeStyle = this.pen.cssColor;
-        g.lineWidth   = this.pen.size;
-      
-        g.beginPath();
-          g.moveTo(this.position.x, this.position.y);
-          g.lineTo(          pos.x,           pos.y);   
-        g.stroke();
-      }
+      g.strokeStyle = this.pen.cssColor;
+      g.lineWidth   = this.pen.size;
+    
+      g.beginPath();
+        g.moveTo(this.position.x, this.position.y);
+        g.lineTo(          pos.x,           pos.y);   
+      g.stroke();
       
       this.position = pos;
     }
   };
   
-  // moveBy(x, y)
-  // moveBy(vector(x, y))
-  Sprite.prototype.moveBy = function (arg1, arg2) {
+  // penTo(x, y)
+  // penTo(vector(x, y))
+  Sprite.prototype.penTo = function (arg1, arg2) {
     var pos = gamework.math.vector(arg1, arg2);
     
     if (pos !== null) {
-      this.moveTo(this.position.x + pos.x, this.position.y + pos.y);
+      if (this.pen.down) {
+        this.lineTo(pos);
+      } else {
+        this.moveTo(pos);
+      }
+    }
+  };
+  
+  // penBy(x, y)
+  // penBy(vector(x, y))
+  Sprite.prototype.penBy = function (arg1, arg2) {
+    var pos = gamework.math.vector(arg1, arg2);
+    
+    if (pos !== null) {
+      this.penTo(this.position.x + pos.x, this.position.y + pos.y);
     }
   };
   
@@ -490,12 +510,33 @@
     m = +m;
     
     if (!isNaN(m) && isFinite(m)) {
-      this.moveBy(Math.sin(this.angle) * m, Math.cos(this.angle) * m);
+      this.penBy(Math.sin(this.angle) * m, Math.cos(this.angle) * m);
     }
   };
   
   Sprite.prototype.back = function (m) {
     this.forward(-m);
+  };
+  
+  
+  Sprite.prototype.formation = function (leaderName, arg1, arg2) {
+    var leader, relPos = gamework.math.vector(arg1, arg2), a;
+
+    leaderName = exports.validateId(leaderName).toLowerCase();
+    
+    if (relPos !== null) {
+      if ((leaderName !== '') && this.layer.sprites.hasOwnProperty(leaderName)) {
+        leader = this.layer.sprites[leaderName];
+        
+        a = Math.atan2(-relPos.y, relPos.x);
+        
+        this.angle = leader.angle;
+        
+        this.penTo(
+          leader.position.x + Math.cos(a + this.angle) * relPos.m, 
+          leader.position.y - Math.sin(a + this.angle) * relPos.m);
+      }
+    }
   };
   // ...Position
   

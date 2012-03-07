@@ -234,6 +234,7 @@
         
         if (flatten) {
           gamework.types.install(window);
+          gamework.help.install(window);
           gamework.string.install(window);
           gamework.collections.install(window);
           gamework.math.install(window);

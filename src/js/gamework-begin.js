@@ -3,7 +3,9 @@
 
   var module = {};
 
-  module.internal    = {}; 
+  module.help        = {};
+  module.help.data   = [];  
+  module.internal    = {};
   module.game        = {};
   module.collections = {};
   module.graphics    = {};

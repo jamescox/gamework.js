@@ -53,7 +53,7 @@
       return mouseButtons[button] || 0;
     };
     
-    ns.keypressed = function (keyname) {
+    ns.keydown = function (keyname) {
       var idx;
       
       if (typeof(keyname) === 'string') {
@@ -80,7 +80,7 @@
         e = window.event;
       }
       
-      keys[e.keyCode] = false;
+      keys[e.keyCode] = 0.0;
       
       return false;
     };
@@ -92,7 +92,7 @@
       
       console.log(e.keyCode);
       
-      keys[e.keyCode] = true;
+      keys[e.keyCode] = (keys[e.keyCode] || 0.0) + 1.0;
       
       return false;
     };

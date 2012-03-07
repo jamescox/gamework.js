@@ -519,6 +519,14 @@
     ns.moveto = function (arg1, arg2) {
       screen.layers.current.currentSprite.moveTo(arg1, arg2);
     };
+    
+    ns.lineto = function (arg1, arg2) {
+      screen.layers.current.currentSprite.lineTo(arg1, arg2);
+    };
+    
+    ns.pento = function (arg1, arg2) {
+      screen.layers.current.currentSprite.penTo(arg1, arg2);
+    };
 
     ns.loadimage = function (path) {
       internal.loadImage(path);
@@ -535,6 +543,10 @@
     
     ns.clear = function () {
       screen.layers.current.clear();
+    };
+    
+    ns.formation = function (leadername, arg1, arg2) {
+      screen.layers.current.currentSprite.formation(leadername, arg1, arg2);
     };
     
     ns.color = color;

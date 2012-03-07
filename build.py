@@ -28,6 +28,26 @@ def plist(pstr):
     l.reverse()
     
     return l
+
+
+def findbin(name):
+    possible_names = (
+        name + '.exe', 
+        name + '.cmd', 
+        name + '.bat', 
+        name + '.sh', 
+        name)
+    
+    paths = os.environ['PATH'].split(os.pathsep)
+    
+    for path in paths:
+        for test_name in possible_names:
+            test_name = os.path.join(path, test_name)
+            if os.path.exists(test_name):
+                return test_name
+
+    return name
+
     
 def pstr(path):          return os.path.join(*path) if path else ''
 def isdir(path):         return os.path.isdir(pstr(path))
@@ -57,7 +77,8 @@ def txtopen(path, flags='r'):
     return codecs.open(pstr(path), flags, encoding='UTF-8')
 
 
-PROJECT_DIR      = plist(os.path.realpath(__file__))[:-1]
+UGLIFYJS         = findbin('uglifyjs')
+PROJECT_DIR      = plist(os.path.realpath(os.path.split(sys.argv[0])[0]))
 SRC_DIR          = PROJECT_DIR + ['src']
 EXAMPLE_SRC      = SRC_DIR + ['examples']
 BUILD_DIR        = ['build']
@@ -94,12 +115,14 @@ BUILD_MODIFIED = mtime(TEMPLATE_DIR + ['index.html'])
 
 
 def compress_js(src):
-    p = Popen(['uglifyjs', '--inline-script', '--no-copyright', '--max-line-len', '1024', '--reserved-names', 'Color,Vector'], stdin=PIPE, stdout=PIPE)
+    global UGLIFYJS
+    
+    p = Popen([UGLIFYJS, '--inline-script', '--no-copyright', '--max-line-len', '1024', '--reserved-names', 'Color,Vector'], stdin=PIPE, stdout=PIPE)
 
-    p.stdin.write(src)
+    p.stdin.write(bytes(src, 'UTF-8'))
     p.stdin.close()
     
-    return p.stdout.read().replace('</script>', '<\\/script>')
+    return str(p.stdout.read(), 'UTF-8').replace('</script>', '<\\/script>')
     
 
 class CompressingHtmlParser(HTMLParser):
@@ -240,3 +263,4 @@ def main(args):
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
+    

@@ -2,10 +2,9 @@ TODO
 ====
 Text output
 Animated sprites
-Keyboard input
+Tile map per layer
 Sound + Music
 API refactor, names specifically.
 Documentation
 Simple physics / Box2D physics (this might be over kill)
 Implement draw paths / polygons using an SVG path style string.
-Sprite stamp!

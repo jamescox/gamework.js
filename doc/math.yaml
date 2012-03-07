@@ -25,7 +25,7 @@ sub-sections:
       - name: angleunits
         type: string
         
-        summary: The units that micro.js will use when expecting or 
+        summary: The units that gamework.js will use when expecting or 
                  returning an angle.
         
         detail:  |
