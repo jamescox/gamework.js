@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Interactive Mode</title>
+    
+    <script>
+      var error, rows = 0, history = [], historyPos = -1, line = '';
+      
+      function evaluate(code) {
+        var result;
+        
+        error = null;
+        
+        try {
+          with (window.frames[0]) {
+            result = eval(code);
+          }
+        } catch (e) {
+          error = e.message;
+          return;
+        }
+        
+        return result;
+      }
+      
+      function escapeHTML(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');;
+      }
+      
+      function repr(value) {
+        var i, a = [], r = '';
+        
+        switch (typeof(value)) {
+        case 'number':
+          r += value;
+          break;
+        
+        case 'string':
+          r += escapeHTML(JSON.stringify(value));   
+          break;
+        
+        case 'function':
+          if (value.__isHelpFunction__) {
+            r += value.USING_HELP;
+          } else {
+            r += value;
+          }
+          break;
+          
+        case 'object':
+          if (value === null) {
+            r += 'null';
+          } else {
+            if ((value instanceof window.frames[0].Array) || (value instanceof Array)) {
+              r += '[';
+              for (i = 0; i < value.length; i += 1) {
+                a.push(repr(value[i]));
+              }
+              r += a.join(', ') + ']';
+            } else {
+              if (value.__isHelpText__) {
+                r += value.text;
+              } else {
+                r += value;
+              }
+            }
+          }
+          break;
+          
+        default:
+          r += value;
+          break;
+        };
+        
+        return r;
+      }
+      
+      function evalPrompt() {
+        var textbox = document.getElementById('gamework-prompt-getline'),
+            output  = document.getElementById('gamework-output'),
+            code    = textbox.value,
+            odd     = (rows % 2 === 1) ? 'odd' : 'even',
+            result;
+        
+        textbox.value = '';
+        
+        if (code.trim() !== '') {
+          result = evaluate(code);
+        
+          if (error === null) {
+            if (typeof(result) !== 'undefined') {
+              output.innerHTML = '<li class="' + odd + '">' + repr(result) + '</li>' + output.innerHTML;
+              rows += 1;
+            }
+          } else {
+            output.innerHTML = '<li class="error ' + odd + '">' + error + '</li>' + output.innerHTML;
+            rows += 1;
+          }
+        }  
+        
+        textbox.focus();
+      }
+      
+      function init() {
+        document.getElementById('gamework-prompt-gobutton').onclick = evalPrompt;
+        document.getElementById('gamework-prompt-getline').onkeyup = function (e) {
+          if (typeof(e) === 'undefined') {
+            e = window.event;
+          }
+          
+          if (e.keyCode === 13) {
+            evalPrompt();
+          }
+        };
+        
+        setInterval(function () { 
+          document.title = window.frames[0].document.title + ' - Interactive Mode';
+        }, 1000);
+      }
+    </script>
+    
+    <style>
+      html, body {
+        width:  100%;
+        height: 100%;
+        
+        margin:  0;
+        padding: 0;
+      }
+      
+      #gamework-screen {
+        position: absolute;
+        
+        left:   0;
+        right:  0;
+        top:    0;
+        bottom: 300px;
+      }
+      
+      #gamework-screen iframe {
+        position: absolute;
+        
+        width:  100%;
+        height: 100%;
+        
+        border:  none;
+        padding: 0;
+        margin:  0;
+      }
+      
+      #gamework-console {
+        position: absolute;
+        
+        left:   0;
+        right:  0;
+        top:    100%;
+        bottom: 0;
+        
+        font-family: monospace;
+        
+        margin-top: -300px;
+      }
+      
+      #gamework-sep {
+        position: absolute;
+        
+        border-top: 1px solid #222;
+        
+        cursor: n-resize;
+        
+        background: #060;
+        
+        width:  100%;
+        height: 3px;
+      }
+      
+      #gamework-sep:hover {
+        background: #0a0;
+      }
+      
+      #gamework-prompt {
+        position: absolute;
+        
+        display: block;
+        
+        width:  100%;
+        height: 23px;
+        
+        border-bottom: 1px solid #060;
+        
+        top: 4px;
+        
+        background: #222;
+        
+        overflow: hidden;
+      }
+      
+      #gamework-prompt-prompt {
+        position: absolute;
+        
+        width: 24px;
+        height: 23px;
+        
+        color: #0d0;
+        
+        font-size:   14px;
+        font-family: monospace;
+        line-height: 23px;
+        
+        text-align: right;
+      }
+      
+      #gamework-prompt-getline-wrapper {
+        position: absolute;
+        
+        left:   24px;
+        right:  32px;
+        height: 23px;
+      }
+      
+      #gamework-prompt-getline {
+        position: absolute;
+        
+        display: block;
+        
+        border:  none;
+        padding: 0 4px;
+        margin:  0;
+        
+        background: #222;
+        color: #0d0;
+        
+        font-size:   14px;
+        font-family: monospace;
+        line-height: 23px;
+        
+        width: 100%;
+        height: 23px;
+        
+        outline: none;
+      }
+      
+      #gamework-prompt-gobutton {
+        position: absolute;
+        
+        display: block;
+        
+        border:  none;
+        padding: 0;
+        margin:  0;
+        
+        background: #222;
+        color: #0d0;
+        
+        font-family: "Webdings";
+        line-height: 23px;
+        
+        right:  0;
+        width:  24px;
+        height: 23px;
+      }
+      
+      #gamework-prompt-gobutton:hover {
+        background: #464;
+      }
+      
+      #gamework-output-wrapper {
+        position: absolute;
+        
+        width: 100%;
+        
+        top:    28px;
+        bottom: 0;
+        
+        background: #444;
+        
+        overflow-y: auto;
+      }
+      
+      #gamework-output {
+        color: #0d0;
+      
+        margin: 0;
+        padding: 0;
+        
+        width: 100%;
+        
+        list-style: none;
+      }
+      
+      #gamework-output > li {
+        margin:  0;
+
+        border-bottom: 1px solid #060;
+
+        padding: 0 4px 0 28px;
+
+        font-size:   14px;
+        line-height: 23px;
+        
+        overflow: hidden;
+        
+        /*height: 23px;*/
+      }
+      
+      #gamework-output .odd {
+        background: #444;
+      }
+      
+      #gamework-output .even {
+        background: #555;
+      }
+      
+      #gamework-output .error {
+        color: red;
+        font-weight: bold;
+      }
+      
+      #gamework-output code {
+        background: #222;
+        
+        font-family: monospace;
+        
+        padding: 1px;
+        border-radius: 2px;
+      }
+      
+      #gamework-output code .arg {
+        color: #0f0;
+      }
+      
+      .gw-help {
+        font-family: sans-serif;
+      }
+      
+      .gw-help h2 {
+        font-size: 1.25em;
+        
+        margin: 0.25em 0;
+      }
+      
+      .gw-help h3 {
+        font-size: 1em;
+        
+        margin: 0.25em 0;
+      }
+      
+      .gw-help ul {
+        list-style: none;
+        
+        padding-left: 1em;
+      }
+      
+      .gw-help li {
+        background: transparent;
+      }
+      
+      #gamework-output code.gw-def {
+        background: transparent;
+        
+        padding-left: 1em;
+      }
+      
+      #gamework-output code.gw-arg {
+        background: transparent;
+        
+        padding-left: 0;
+      }
+      
+      #gamework-output h2 code.gw-def {
+        background: transparent;
+        
+        padding-left: 0;
+      }
+      
+      .gw-def-count {
+        font-size:   0.5em;
+        font-weight: normal;
+        color: #0b0;
+      }
+      
+      code a {
+        color: #0d0;
+        text-decoration: none;
+      }
+      
+      code a:hover {
+        color: #0f0;
+        text-decoration: underline;
+      }
+      
+      .gw-nohelp {
+        color: #0a0;
+      }
+      
+      table.gw-args {
+        margin-left: 1em;
+        
+        border-collapse: collapse;
+      }
+      
+      .gw-args th {
+        padding: 0 1em 0 0;
+        
+        text-align: left;
+      }
+      
+      .gw-args td {
+        padding: 0;
+      }
+      
+      .gw-types {
+        color: #0a0;
+        font-weight: normal;
+        font-size: 0.75em;
+      }
+      
+      .gw-returns {
+        margin: 0;
+        padding-left: 1em;
+      }
+    </style>
+  </head>
+  <body onload="init()">
+    <div id="gamework-screen">
+      <iframe src="index.html"></iframe>
+    </div>
+    <div id="gamework-console">
+      <div id="gamework-sep"></div>
+      <div id="gamework-prompt">
+        <div id="gamework-prompt-prompt">&gt;&nbsp;</div>
+        <div id="gamework-prompt-getline-wrapper">
+          <input id="gamework-prompt-getline" id="code">
+        </div>
+        <button id="gamework-prompt-gobutton">4</button>
+      </div>
+      <div id="gamework-output-wrapper">
+        <ul id="gamework-output"></ul>
+      </div>
+    </div>
+  </body>
+</html>

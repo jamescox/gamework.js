@@ -1,13 +1,13 @@
 (function (exports, helpData) {
   'use strict';
 
-  var USING_HELP = ('<span class="help">' + 
-      'type: <code><a href="#" onclick="document.getElementById(\'gamework-prompt-getline\').value=&quot;help();&quot;; document.getElementById(\'gamework-prompt-getline\').focus()">help();</a></code> for a list of all built-in ' + 
-            'functions and properties.<br>' +
-      'or type: <code><a href="#" onclick="document.getElementById(\'gamework-prompt-getline\').value=&quot;help(\'&quot;; document.getElementById(\'gamework-prompt-getline\').focus()">help(<em class="arg">name</em>);</a></code> for ' + 
-               'specific help regarding the <em>named</em> function ' +
-               'or property.' +
-    '</span>');
+  var USING_HELP = '<div class="gw-help">' + 
+                     'type: <code><a href="#" onclick="document.getElementById(\'gw-getline\').value=&quot;help();&quot;; document.getElementById(\'gamework-prompt-getline\').focus()">help();</a></code> for a list of all built-in ' + 
+                     'functions and properties.<br>' +
+                     'or type: <code><a href="#" onclick="document.getElementById(\'gw-getline\').value=&quot;help(\'&quot;; document.getElementById(\'gamework-prompt-getline\').focus()">help(<em class="arg">name</em>);</a></code> for ' + 
+                     'specific help regarding the <em>named</em> function ' +
+                     'or property.' +
+                   '</div>';
 
   function helpOverview() {
     var helpText = '';
@@ -99,7 +99,7 @@
     
   exports.install = function (ns) {
     ns.help = function (name) {
-      var helpText = '<span class="gw-help">';
+      var helpText = '<div class="gw-help">';
       
       if (typeof(name) === 'undefined') {
         helpText += helpOverview();
@@ -107,14 +107,13 @@
         helpText += helpOn(name);
       }
       
-      helpText += '</span>'
+      helpText += '</div>'
       
-      return { text: helpText, __isHelpText__: true };
+      return { __repr__: helpText };
     };
     
     Object.defineProperties(ns.help, {
-      __isHelpFunction__: { value: true },
-      USING_HELP:         { value: USING_HELP }
+      __repr__: { value: USING_HELP }
     });
   };
   

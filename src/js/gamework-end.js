@@ -1,5 +1,6 @@
 (function () {
-  // delete gamework.internal; // Commented out for debugging purposes.
+  delete gamework.internal;
+  delete gamework.help.data;
 
   Object.freeze(window.gamework            );
   Object.freeze(window.gamework.help       );

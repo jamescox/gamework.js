@@ -1,0 +1,269 @@
+html, body {
+  width:  100%;
+  height: 100%;
+  
+  margin:  0;
+  padding: 0;
+}
+
+.gw-screen {
+  position: absolute;
+  
+  top: 0;
+  left: 0; right: 0;
+}
+
+.gw-screen iframe {
+  display: block;
+  
+  border:  none;
+  margin:  0;
+  padding: 0;
+
+  width:  100%;
+  height: 100%;
+}
+
+.gw-separator {
+  position: absolute;
+  
+  height: 5px;
+  
+  border-top: 1px solid #222;
+  
+  background: #070;
+  
+  left: 0; right: 0;
+  
+  cursor: n-resize;
+}
+
+.gw-separator:hover {
+  background: #0a0;
+}
+
+.gw-console {
+  position: absolute;
+  
+  top: 100%; bottom: 0;
+  left: 0;   right: 0;
+  
+  background: #444;
+}
+
+.gw-prompt {
+  position: relative;
+  
+  height: 23px;
+  
+  border-bottom: 1px solid #070;
+  
+  font-weight: bold;
+  
+  text-align: right;
+  
+  font: 16px/23px monospace;
+  
+  background: #222;
+  color:      #0d0;
+}
+
+.gw-prompt .gw-cursor {
+  position: absolute;
+  
+  width:  30px;
+  height: 23px;
+}
+
+.gw-prompt .gw-getline {
+  position: absolute;
+  
+  height: 23px;
+  
+  left: 30px; right: 30px;
+}
+
+.gw-prompt .gw-getline input {
+  position: absolute;
+  
+  display: block;
+  
+  outline: none;
+  border:  none;
+  margin:  0;
+  padding: 0;
+  
+  width:  100%;
+  height: 100%;
+  
+  background: #222;
+  color:      #0d0;
+  
+  font: 16px/23px monospace;
+}
+
+.gw-prompt button {
+  position: absolute;
+
+  display: block;
+
+  background: #222;
+
+  border: none;
+  margin:  0;
+  padding: 0;
+  
+  right: 0;
+  
+  width:  24px;
+  height: 23px;
+}
+
+.gw-prompt button:hover {
+  background: #464;
+}
+
+.gw-prompt button img {
+  position: absolute;
+  
+  top:  0;
+  left: 0;
+  
+  margin:  0;
+  padding: 0;
+}
+
+.gw-output {
+  position: absolute;
+  
+  font-family: sans-serif;
+  
+  left: 0;   right: 0;
+  top: 24px; bottom: 0;
+  
+  overflow: auto;
+}
+
+.gw-lines {
+  padding: 0;
+  margin:  0;
+}
+
+.gw-line {
+  padding: 0 0 0 30px;
+
+  color: #0d0;
+
+  border-bottom: 1px solid #070;
+
+  font-size:   16px;
+  line-height: 23px;
+}
+
+.gw-odd {
+  background: #484848;
+}
+
+.gw-even {
+  background: #404040;
+}
+
+.gw-line code {
+  background: #222;
+  
+  padding: 1px 2px;
+  
+  border-radius: 2px;
+}
+
+.gw-line code.gw-value {
+  background: transparent;
+  color: #efe;
+}
+
+.gw-line code a {
+  color: #0d0;
+  
+  text-decoration: none;
+}
+
+.gw-line code a:hover {
+  color: #4f4;
+  
+  text-decoration: underline;
+}
+
+.gw-line hr {
+  background: #070;
+  
+  border: none;
+  
+  padding: 0;
+  margin:  2px 0;
+  
+  height: 1px;
+}
+
+.gw-line .gw-value code {
+  background: transparent;
+  
+  color: #afa;
+}
+
+.gw-line code.gw-def {
+  background: transparent;
+}
+
+.gw-line code.gw-nohelp {
+  color: #0a0;
+}
+
+.gw-line .gw-cursor {
+  font: 16px/23px monospace;
+  
+  color: #afa;
+}
+
+.gw-line div {
+  margin-left: -24px;
+  padding-left: 24px;
+}
+
+.gw-line div h2 {
+  font-size: 1.3em;
+  
+  margin: 0.5em 0;
+}
+
+.gw-line div h3 {
+  font-size: 1.15em;
+  
+  margin: 0.5em 0;
+}
+
+.gw-line div h4 {
+  font-size: 1em;
+  
+  margin: 0.5em 0;
+}
+
+.gw-def-count {
+  color: #0a0;
+  
+  font-weight: normal;
+  font-size: 0.5em;
+}
+
+.gw-help {
+}
+
+.gw-number {
+  background: url('../img/number.png') no-repeat;
+}
+
+.gw-error {
+  color: red;
+  font-weight: bold;
+  
+  background: url('../img/error.png') no-repeat;
+}

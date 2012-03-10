@@ -119,6 +119,10 @@
   };
     
   Layer.prototype.moveDown = function (by) {
+    if (typeof(by) === 'undefined') {
+      by = 1;
+    }
+    
     if (isFinite(by)) {
       this.setZ(this.z - (+by));
     }
@@ -127,6 +131,10 @@
   };
   
   Layer.prototype.moveUp = function (by) {
+    if (typeof(by) === 'undefined') {
+      by = 1;
+    }
+    
     if (isFinite(by)) {
       this.setZ(this.z + (+by));
     }

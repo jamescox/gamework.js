@@ -14,7 +14,7 @@ gamework.help.data.push({
           
           'property_types': ['string'],
           
-          'description': 'Get and sets the name of the currently active layer.'
+          'description': "Get and sets the currently active layer using it's name."
         },
         {
           'name': 'alllayers',
@@ -55,6 +55,50 @@ gamework.help.data.push({
           'returns': {
             'types': ['string'],
             'description': "the name of newly created layer, or <code>''</code> if there was an error."
+          }
+        }
+      ]
+    },
+    {
+      'title': 'Sprite Management',
+      
+      'definitions': [
+        {
+          'name': 'moveto',
+          
+          'type': 'function',
+          
+          'call_signatures': [
+            'moveto(position)',
+            'moveto(x, y)'
+          ],
+          
+          'description': 'Moves the current sprite to the give location.',
+          
+          'args': [
+            {
+              'name': 'position',
+              'types': ['vector'],
+              
+              'description': 'a vector like object specifing the position to move to.'
+            },
+            {
+              'name': 'x',
+              'types': ['number'],
+              
+              'description': 'the x-coordinate of the position to move to.'
+            },
+            {
+              'name': 'y',
+              'types': ['number'],
+              
+              'description': 'the x-coordinate of the position to move to.'
+            }
+          ],
+          
+          'returns': {
+            'types': ['vector'],
+            'description': 'the final location the sprite was moved to.'
           }
         }
       ]

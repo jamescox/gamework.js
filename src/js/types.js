@@ -9,7 +9,8 @@
       
       if (type === 'object') {
         if (value) {
-          if (value instanceof Array) {
+          //if (value instanceof Array) {
+          if (Object.prototype.toString.call(value) === '[object Array]') {
             return 'array';
           }
         } else {
