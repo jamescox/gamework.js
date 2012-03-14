@@ -6,8 +6,8 @@
     
     this.config = {
       size:        gamework.math.vector(400, 400),
-      borderColor: gamework.graphics.color(0.55, 0.55, 0.55),
-      pageColor:   gamework.graphics.color(0.50, 0.50, 0.50)
+      borderColor: gamework.graphics.color('#222222'),
+      pageColor:   gamework.graphics.color('#808080')
     };
     
     this.layers = {

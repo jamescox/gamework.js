@@ -90,8 +90,6 @@
         e = window.event;
       }
       
-      console.log(e.keyCode);
-      
       keys[e.keyCode] = (keys[e.keyCode] || 0.0) + 1.0;
       
       return false;

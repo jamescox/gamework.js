@@ -257,6 +257,16 @@
         enumerable: true
       },
       
+      ispendown: {
+        get: function () {
+          return screen.layers.current.currentSprite.isPenDown();
+        },
+        set: function (down) {
+          screen.layers.current.currentSprite.setPenDown(down);
+        },
+        enumerable: true
+      },
+      
       spriteupdate: {
         get: function () {
           return screen.layers.current.currentSprite.getUserUpdateFunction();
@@ -482,6 +492,10 @@
   
     ns.penup = function () {
       screen.layers.current.currentSprite.penUp();
+    };
+    
+    ns.togglepen = function () {
+      screen.layers.current.currentSprite.togglePen();
     };
     
     ns.forward = function (m) {

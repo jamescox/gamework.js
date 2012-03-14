@@ -866,6 +866,10 @@
   Sprite.prototype.penUp = function () {
     this.pen.down = false;
   };
+  
+  Sprite.prototype.togglePen = function () {
+    this.pen.down = !this.pen.down;
+  };
   // ...Pen up/down  
   
   // Visibility...
