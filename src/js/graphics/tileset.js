@@ -60,8 +60,8 @@
           
           g.drawImage(
             this.image, 
-            this.left + (index % this.widthInTiles)  * this.tilewidth,
-            this.right + Math.floor(index / this.widthInTiles) * this.tileheight,
+            this.left + (index % this.widthInTiles) * this.tilewidth,
+            this.top + Math.floor(index / this.widthInTiles) * this.tileheight,
             this.tilewidth, this.tilewidth,
             -width / 2, -height / 2, width, height);
           
@@ -72,13 +72,22 @@
   };
   
   
-  TileSet.prototype.drawSequencedTile = function (g, name, baseFrame, width, height) {
-    var animation;
+  TileSet.prototype.drawAnimatedTile = function (g, name, baseFrame, width, height) {
+    var animation, frameIndex;
     
     name = internal.validateId(name).toLowerCase();
     
     if (name !== '') {
-      
+      animation = this.animations[name];
+      if (animation) {
+        switch (animation.loop) {
+        case 'cycle':
+          frameIndex = Math.floor((gamework.graphics.frames - baseFrame) / animation.rate) % animation.frames.length;
+          break;
+        };
+        
+        this.drawIndexedTile(g, animation.frames[frameIndex], width, height);
+      }
     }
   };
   
@@ -179,7 +188,56 @@
     
     
     ns.newanimation = function (tilesetname, animationname, frames, loop, rate) {
+      var tileset, animationnameCi, animation, validFrames = true;
       
+      tilesetname = internal.validateId(tilesetname);
+      
+      animationname   = internal.validateId(animationname);
+      animationnameCi = animationname.toLowerCase();
+      
+      if (typeof(loop) === 'undefined') {
+        loop = 'cycle';
+      }
+      if (typeof(rate) === 'undefined') {
+        rate = 1;
+      }
+      
+      loop = internal.validateId(loop).toLowerCase();
+      rate = Math.floor(+rate);
+      
+      if ((tilesetname !== '')
+      &&  (animationname !== '') 
+      &&  (gamework.types.gettype(frames) === 'array')
+      &&  gamework.collections.contains(['cycle', 'pingpong', 'none'], loop)
+      &&  isFinite(rate)
+      &&  (rate > 0)) {
+        frames = gamework.collections.map(function (i) { return +i; }, frames);
+        
+        validFrames = gamework.collections.reduce(function (a, i) { return a && !isNaN(i); }, validFrames, frames);
+        
+        tileset = internal.getTileSet(tilesetname);
+        
+        if ((tileset !== null) && validFrames) {
+          if (!tileset.animations.hasOwnProperty(animationnameCi)) {
+            animation = {
+              name:   animationname,
+              frames: frames,
+              loop:   loop,
+              rate:   rate
+            };
+            
+            tileset.animations[animationnameCi] = animation;
+          } else {
+            animationname = '';
+          }
+        } else {
+          animationname = '';
+        }
+      } else {
+        animationname = '';
+      }
+      
+      return animationname;
     };
     
     

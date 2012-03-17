@@ -127,7 +127,7 @@
         this.drawCircleSprite(g);
         break;
       
-      case 'pac-man':
+      case 'pacman':
         this.drawPacManSprite(g);
         break;
 
@@ -406,7 +406,11 @@
     var tileset = exports.getTileSet(this.tileset);
     
     if (tileset !== null) {
-      tileset.drawIndexedTile(g, this.tile, this.size.x, this.size.y);
+      if (typeof(this.tile) === 'string') {
+        tileset.drawAnimatedTile(g, this.tile, 0, this.size.x, this.size.y);
+      } else {
+        tileset.drawIndexedTile(g, this.tile, this.size.x, this.size.y);
+      }
     }
   };
   // ...Sprite rendering
@@ -743,7 +747,7 @@
       'ellipse', 
       'square', 
       'rectangle', 
-      'pac-man',
+      'pacman',
       'ghost',
       'image',
       'tileset'], skin)) {
