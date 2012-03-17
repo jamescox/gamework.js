@@ -8,7 +8,9 @@
   }
   
   
-  function TileSet(name, imagename, tilewidth, tileheight, originx, originy) {
+  function TileSet(name, imagename, tilewidth, tileheight, left, top, right, bottom) {
+    console.log(arguments);
+    
     this.name       = name;
     
     this.imagename  = imagename
@@ -16,14 +18,16 @@
     
     this.tilewidth  = tilewidth;
     this.tileheight = tileheight;
-    this.originx    = originx;
-    this.originy    = originy;
+    this.left       = left;
+    this.top        = top;
+    this.right      = right;
+    this.bottom     = bottom;
     
     this.widthInTiles  = -1;
     this.heightInTiles = -1;
     this.tiles         = -1;
     
-    this.sequences  = {};
+    this.animations = {};
   }
   
   
@@ -33,10 +37,16 @@
       
       if (this.image.ready) {
         if (this.tiles === -1) {
+          if (this.right === -1) {
+            this.right = this.image.width;
+          }
+          if (this.bottom === -1) {
+            this.bottom = this.image.height;
+          }
           this.widthInTiles  = Math.floor(
-            (this.image.width  - this.originx) / this.tilewidth);
+            (this.right - this.left) / this.tilewidth);
           this.heightInTiles = Math.floor(
-            (this.image.height - this.originy) / this.tileheight);
+            (this.bottom - this.top) / this.tileheight);
           this.tiles = (this.widthInTiles * this.heightInTiles);
         }
         
@@ -50,8 +60,8 @@
           
           g.drawImage(
             this.image, 
-            this.originx + (index % this.widthInTiles)  * this.tilewidth,
-            this.originy + Math.floor(index / this.heightInTiles) * this.tileheight,
+            this.left + (index % this.widthInTiles)  * this.tilewidth,
+            this.right + Math.floor(index / this.widthInTiles) * this.tileheight,
             this.tilewidth, this.tilewidth,
             -width / 2, -height / 2, width, height);
           
@@ -62,26 +72,116 @@
   };
   
   
-  exports.install = function (ns) {
-    // newtileset(name : string, image : string, framewidth : number, frameheight : number, originx : number, originy : number)
-    ns.newtileset = function (name, image, tilewidth, tileheight, originx, originy) {
-      var nameCi, tileset;
+  TileSet.prototype.drawSequencedTile = function (g, name, baseFrame, width, height) {
+    var animation;
+    
+    name = internal.validateId(name).toLowerCase();
+    
+    if (name !== '') {
       
-      name   = internal.validateId(name);
-      nameCi = name.toLowerCase();
-      
+    }
+  };
+  
+  
+  function newtileset(name, image, arg1, arg2, arg3, arg4, arg5, arg6) {
+    var tileSet, nameCi, tileSize=null, 
+        p1=gamework.math.vector(0, 0), 
+        p2=gamework.math.vector(-1, -1);
+        
+    name   = internal.validateId(name);
+    nameCi = name.toLowerCase();
+    
+    if (typeof(arg6) !== 'undefined') {
+      // 6 argument call, should be all numbers.
+      tileSize = gamework.math.vector(+arg1, +arg2);
+      p1       = gamework.math.vector(+arg3, +arg4);
+      p2       = gamework.math.vector(+arg5, +arg6);
+    } else if (typeof(arg5) !== 'undefined') {
+      // 5 argument call, should be one vector and rest numbers
+      if (isNaN(arg1)) { // tileSize is a vector like?
+        tileSize = gamework.math.vector(arg1);
+        p1       = gamework.math.vector(+arg2, +arg3);
+        p2       = gamework.math.vector(+arg4, +arg5);
+      } else if (isNaN(arg3)) { // p1 is vector like.
+        tileSize = gamework.math.vector(+arg1, +arg2);
+        p1       = gamework.math.vector(arg3);
+        p2       = gamework.math.vector(+arg4, +arg5);
+      } else if (isNaN(arg5)) { // p2 is vector like.
+        tileSize = gamework.math.vector(+arg1, +arg2);
+        p1       = gamework.math.vector(+arg3, +arg4);
+        p2       = gamework.math.vector(arg5);
+      }
+    } else if (typeof(arg4) !== 'undefined') {
+      if (!(isNaN(arg1) || isNaN(arg2) || isNaN(arg3) || isNaN(arg4))) {
+        // 4 arguments all numbers, p2 is default value.
+        tileSize = gamework.math.vector(+arg1, +arg2);
+        p1       = gamework.math.vector(+arg3, +arg4);
+      } else /* 4 arguments, 2 vectors and 2 numbers */ if (!isNaN(arg1)) { // tileSize is 2 numbers
+        tileSize = gamework.math.vector(+arg1, +arg2);
+        p1       = gamework.math.vector(arg3);
+        p2       = gamework.math.vector(arg4);
+      } else if (!isNaN(arg2)) { // p1 is 2 numbers
+        tileSize = gamework.math.vector(arg1);
+        p1       = gamework.math.vector(+arg2, +arg3);
+        p2       = gamework.math.vector(arg4);
+      } else if (!isNaN(arg3)) { // p2 is 2 numbers
+        tileSize = gamework.math.vector(arg1);
+        p1       = gamework.math.vector(arg2);
+        p2       = gamework.math.vector(+arg3, +arg4);
+      }
+    } else if (typeof(arg3) !== 'undefined') {
+      // 3 arguments
+      if (isNaN(arg1) && isNaN(arg2) && isNaN(arg3)) { // all 3 arguments are vectors.
+        tileSize = gamework.math.vector(arg1);
+        p1       = gamework.math.vector(arg2);
+        p2       = gamework.math.vector(arg3);
+      } else /* 3 arguments, 1 vector, 2 numbers, p2 is defualt value.  */ if (isNaN(arg1)) { // tileSize is a vector
+        tileSize = gamework.math.vector(arg1);
+        p1       = gamework.math.vector(+arg2, +arg3);
+      } else if (isNaN(arg3)) { // p1 is a vector
+        tileSize = gamework.math.vector(+arg1, +arg2);
+        p1       = gamework.math.vector(arg3);
+      }
+    } else if (typeof(arg2) !== 'undefined') {
+      // 2 arguments
+      if (isNaN(arg1) && isNaN(arg2)) { // tileSize, and p1 are vectors, p2 is default.
+        tileSize = gamework.math.vector(arg1);
+        p1       = gamework.math.vector(arg2);
+      } else if (!(isNaN(arg1) || isNaN(arg2))) { // tileSize is 2 numbers, p1 and p2 are defualt
+        tileSize = gamework.math.vector(+arg1, +arg2);
+      }
+    } else if (typeof(arg1) !== 'undefined') {
+      // 1 argument should be a vector for tileSize
+      tileSize = gamework.math.vector(arg1);
+    }
+    
+    
+    if (!((tileSize === null) || (p1 === null) || (p2 === null))) {
       if (name !== '') {
         if (!tilesets.hasOwnProperty(nameCi)) {
-          tileset = new TileSet(name, image, tilewidth, tileheight, originx, originy);
+          tileSet = new TileSet(name, image, tileSize.x, tileSize.y, p1.x, p1.y, p2.x, p2.y);
           
-          tilesets[nameCi] = tileset;
+          tilesets[nameCi] = tileSet;
         } else {
-          return '';
+          name = '';
         }
       }
+    } else {
+      name = '';
+    }
+    
+    return name;
+  }
+
+  
+  exports.install = function (ns) {
+    ns.newtileset = newtileset;
+    
+    
+    ns.newanimation = function (tilesetname, animationname, frames, loop, rate) {
       
-      return name;
     };
+    
     
     ns.renametileset = function (fromname, toname) {
     };

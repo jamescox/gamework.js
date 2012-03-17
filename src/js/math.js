@@ -90,7 +90,7 @@
             arg2 = arg1[1];
             arg1 = arg1[0];
             
-            v = vector(arg1, arg2);
+            v = gamework.math.vector(arg1, arg2);
           } else if (gamework.types.gettype(arg1) === 'object') {
             // Vector like object.
             arg2 = arg1.y;
