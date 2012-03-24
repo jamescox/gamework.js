@@ -18,17 +18,17 @@
       };
       
       src = document.createElement('source');
-      src.setAttribute('src', 'game/' + name + '.ogg');
+      src.setAttribute('src', 'game/resources/' + name + '.ogg');
       src.setAttribute('type', 'audio/ogg');
       sound.appendChild(src);
 
       src = document.createElement('source');
-      src.setAttribute('src', 'game/' + name + '.mp3');
+      src.setAttribute('src', 'game/resources/' + name + '.mp3');
       src.setAttribute('type', 'audio/mp3');
       sound.appendChild(src);
             
       src = document.createElement('source');
-      src.setAttribute('src', 'game/' + name + '.wav');
+      src.setAttribute('src', 'game/resources/' + name + '.wav');
       src.setAttribute('type', 'audio/wav');
       sound.appendChild(src);
 

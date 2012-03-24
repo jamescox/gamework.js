@@ -1,8 +1,11 @@
 TODO
 ====
 Text output
+Sprite ordering
+Game States
 Animated sprites
-Tile map per layer
+Additional tile set params, margin, padding?
+Tile map per layer? maybe not needed with sprite oredering?
 Sound + Music
 API refactor, names specifically.
 Documentation

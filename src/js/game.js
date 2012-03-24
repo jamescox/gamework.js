@@ -262,7 +262,7 @@
         mainloop.start();
         
         window.clearInterval(window.__titleAnimation__);
-        gamework.game.title = 'Untitled Game';
+        document.title = 'Untitled Game';
         loadScript(mainScript, function () {
           mainloop.endloadtask();
         });

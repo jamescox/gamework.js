@@ -9,8 +9,6 @@
   
   
   function TileSet(name, imagename, tilewidth, tileheight, left, top, right, bottom) {
-    console.log(arguments);
-    
     this.name       = name;
     
     this.imagename  = imagename
@@ -62,7 +60,7 @@
             this.image, 
             this.left + (index % this.widthInTiles) * this.tilewidth,
             this.top + Math.floor(index / this.widthInTiles) * this.tileheight,
-            this.tilewidth, this.tilewidth,
+            this.tilewidth, this.tileheight,
             -width / 2, -height / 2, width, height);
           
           g.restore();
@@ -82,7 +80,7 @@
       if (animation) {
         switch (animation.loop) {
         case 'cycle':
-          frameIndex = Math.floor((gamework.graphics.frames - baseFrame) / animation.rate) % animation.frames.length;
+          frameIndex = Math.floor((gamework.graphics.framecount - baseFrame) / animation.rate) % animation.frames.length;
           break;
         };
         

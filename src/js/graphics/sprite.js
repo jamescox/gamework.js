@@ -46,13 +46,13 @@
     this.skin    = 'arrow';
     this.image   = '';
     this.tileset = '';
-    this.tile    = 1;
+    this.tilemap = new exports.TileMap();
     
     // Behaviour / Animation.
     this.userUpdateFunction = null;
     
-    this.tileinfo = {width: 0, height: 0};
-    this.tile     = 0; // The default tile.
+    // this.tileinfo = {width: 0, height: 0};
+    // this.tile     = 0; // The default tile.
     
     // IDEA:  this.direction = {x: 0, y: 0, angle: 0};
     
@@ -139,8 +139,8 @@
         this.drawImageSprite(g);
         break;
         
-      case 'tileset':
-        this.drawTileSetSprite(g);
+      case 'tilemap':
+        this.drawTileMapSprite(g);
         break;
       }
       
@@ -267,7 +267,7 @@
         g.save();
     
         g.scale(1, -1);
-        g.drawImage(img, -img.width / 2, -img.height / 2);
+        g.drawImage(img, -this.size.x / 2, -this.size.y / 2);
         
         g.restore();
       }
@@ -402,7 +402,10 @@
   };
   
   
-  Sprite.prototype.drawTileSetSprite = function (g) {
+  Sprite.prototype.drawTileMapSprite = function (g) {
+    this.tilemap.draw(g, this.tileset, this.size.x, this.size.y);
+    
+    /*
     var tileset = exports.getTileSet(this.tileset);
     
     if (tileset !== null) {
@@ -411,7 +414,7 @@
       } else {
         tileset.drawIndexedTile(g, this.tile, this.size.x, this.size.y);
       }
-    }
+    }*/
   };
   // ...Sprite rendering
   
@@ -750,7 +753,7 @@
       'pacman',
       'ghost',
       'image',
-      'tileset'], skin)) {
+      'tilemap'], skin)) {
       this.skin = skin;
     }
   };
@@ -767,6 +770,13 @@
     }
   };
   
+  
+  Sprite.prototype.tile = function (arg1, arg2, arg3) {
+    return this.tilemap.tile(arg1, arg2, arg3);
+  };
+  
+  
+  /*
   Sprite.prototype.getTile = function () {
     return this.tile;
   };
@@ -777,7 +787,7 @@
     }
     
     this.tile = tile;
-  };
+  };*/
   
   Sprite.prototype.getTileSet = function () {
     return this.tileset;
@@ -910,6 +920,15 @@
   
   Sprite.prototype.closestSpriteName = function (multiLayer) {
     multiLayer = !!multiLayer;
+  };
+  
+  
+  Sprite.prototype.getData = function () {
+    return this.data;
+  };
+  
+  Sprite.prototype.setData = function (data) {
+    this.data = data;
   };
   
   

@@ -134,7 +134,7 @@
   
   exports.install = function (ns) {
     Object.defineProperties(ns, {
-      frames: {
+      framecount: {
         get: function () {
           return frames;
         },
@@ -277,6 +277,16 @@
         enumerable: true
       },
       
+      spritedata: {
+        get: function () {
+          return screen.layers.current.currentSprite.getData();
+        },
+        set: function (data) {
+          screen.layers.current.currentSprite.setData(data);
+        },
+        enumerable: true
+      },
+      
       alllayers: {
         get: function () {
           return screen.getLayersByName();
@@ -341,6 +351,7 @@
         enumerable: true
       },
       
+      /*
       spritetile: {
         get: function () {
           return screen.layers.current.currentSprite.getTile();
@@ -350,6 +361,7 @@
         },
         enumerable: true
       },
+      */
       
       spritetileset: {
         get: function () {
@@ -555,12 +567,52 @@
       screen.layers.current.currentSprite.stamp();
     };
     
+    ns.spritetile = function (arg1, arg2, arg3) {
+      screen.layers.current.currentSprite.tile(arg1, arg2, arg3);
+    };
+    
     ns.clear = function () {
       screen.layers.current.clear();
     };
     
     ns.formation = function (leadername, arg1, arg2) {
       screen.layers.current.currentSprite.formation(leadername, arg1, arg2);
+    };
+    
+    ns.spritefont = function (family) {
+      // TODO
+    };
+    
+    ns.spritefontsize = function (size) {
+      // TODO
+    };
+    
+    ns.spritefontstyle = function (style) {
+      // TODO
+    };
+    
+    ns.print = function (text) {
+      // TODO
+    };
+    
+    ns.drawsquare = function () {
+      // TODO
+    };
+    
+    ns.drawrectangle = function () {
+      // TODO
+    };
+    
+    ns.drawcircle = function () {
+      // TODO
+    };
+    
+    ns.drawellipse = function () {
+      // TODO
+    };
+    
+    ns.drawpolygon = function () {
+      // TODO
     };
     
     ns.color = color;
@@ -603,7 +655,7 @@
           gamework.game.endloadtask();
         };
 
-        img.src = 'game/' + path;
+        img.src = 'game/resources/' + path;
         imageCache[path] = img;
       }
     }
