@@ -141,6 +141,44 @@
         enumerable: true
       },
       
+      screensize: {
+        get: function () {
+          return screen.getSize();
+        },
+        set: function (size) {
+          screen.setSize(size);
+        },
+        enumerable: true
+      },
+      
+      screenleft: {
+        get: function () {
+          return -screen.getSize().x / 2;
+        },
+        enumerable: true
+      },
+      
+      screenright: {
+        get: function () {
+          return screen.getSize().x / 2;
+        },
+        enumerable: true
+      },
+      
+      screentop: {
+        get: function () {
+          return screen.getSize().y / 2;
+        },
+        enumerable: true
+      },
+      
+      screenbottom: {
+        get: function () {
+          return -screen.getSize().y / 2;
+        },
+        enumerable: true
+      },
+      
       bordercolor: {
         get: function () {
           return screen.getBorderColor();

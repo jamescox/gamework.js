@@ -11,3 +11,5 @@ API refactor, names specifically.
 Documentation
 Simple physics / Box2D physics (this might be over kill)
 Implement draw paths / polygons using an SVG path style string.
+LookAt should also be able to take a sprite name.
+"othersprite" variable where all sprite* functions and properties are available.
